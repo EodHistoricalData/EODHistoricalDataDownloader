@@ -1,0 +1,213 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Base -->
+    <SolidColorBrush x:Key="ForegroundBrush" Color="{DynamicResource ForegroundColor}" />
+    <LinearGradientBrush x:Key="BackgroundBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource BackgroundColor1}" Offset="0"/>
+        <GradientStop Color="{DynamicResource BackgroundColor2}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!--#region ControlsColors -->
+
+    <!-- Standart -->
+    <SolidColorBrush x:Key="ForegroundControlBrush" Color="{DynamicResource ForegroundControlColor}" />
+    <LinearGradientBrush x:Key="BackgroundEodControlBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ColorEod1}" Offset="0"/>
+        <GradientStop Color="{DynamicResource ColorEod2}" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="BackgroundEodButtonSelectBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ColorEodButtonSelected}" Offset="0"/>
+        <GradientStop Color="{DynamicResource ColorEodButton}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="BackgroundEodButtonPageBrushEod" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ColorEodButtonPage1}" Offset="0"/>
+        <GradientStop Color="{DynamicResource ColorEodButtonPage2}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="BackgroundEodButtonPageSelectedBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ColorEodButtonPageSelected1}" Offset="0"/>
+        <GradientStop Color="{DynamicResource ColorEodButtonPageSelected2}" Offset="1"/>
+    </LinearGradientBrush>
+
+
+    <LinearGradientBrush x:Key="BackgroundControlBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource BackgroundControlColor1}" Offset="0"/>
+        <GradientStop Color="{DynamicResource BackgroundControlColor2}" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="BackgroundControlDisabledBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource BackgroundControlDisabledColor1}" Offset="0"/>
+        <GradientStop Color="{DynamicResource BackgroundControlDisabledColor2}" Offset="0.7"/>
+        <GradientStop Color="{DynamicResource BackgroundControlDisabledColor3}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="BorderControlBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource BorderColor}" Offset="0" />
+        <GradientStop Color="{DynamicResource BorderColor}" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="BorderControlBrush2" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource BorderColor}" Offset="0" />
+        <GradientStop Color="{DynamicResource BorderColor}" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="BorderHoverBrush" StartPoint="0,0.5" EndPoint="1,0.5">
+        <GradientStop Color="{DynamicResource BorderHoverColor}" Offset="0.204" />
+        <GradientStop Color="{DynamicResource BorderHoverColor}" Offset="0.864" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="BorderDisabledBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource BorderDisabledColor}" Offset="0"/>
+        <GradientStop Color="{DynamicResource BorderDisabledColor}" Offset="0.7"/>
+        <GradientStop Color="{DynamicResource BorderDisabledColor}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Button -->
+    <SolidColorBrush x:Key="ButtonForegroundBrash" Color="{DynamicResource ButtonForegroundColor}" />
+    <LinearGradientBrush x:Key="ButtonBackgroundBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ButtonBackgroundColor1}" Offset="0"/>
+        <GradientStop Color="{DynamicResource ButtonBackgroundColor2}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="ButtonBackgroundBrushEod" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ColorEod3}" Offset="0"/>
+        <GradientStop Color="{DynamicResource ColorEodButton}" Offset="1"/>
+    </LinearGradientBrush>
+
+
+    <LinearGradientBrush x:Key="ButtonBackgroundHoverBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ButtonBackgroundHoverColor1}" Offset="0"/>
+        <GradientStop Color="{DynamicResource ButtonBackgroundHoverColor2}" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ButtonBackgroundPressedBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ButtonBackgroundPressedColor1}" Offset="0"/>
+        <GradientStop Color="{DynamicResource ButtonBackgroundPressedColor2}" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ButtonBackgroundDangerBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ButtonBackgroundDangerColor1}" Offset="0"/>
+        <GradientStop Color="{DynamicResource ButtonBackgroundDangerColor2}" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ButtonBackgroundHoverDangerBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ButtonBackgroundHoverDangerColor1}" Offset="0"/>
+        <GradientStop Color="{DynamicResource ButtonBackgroundHoverDangerColor2}" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ButtonBackgroundPressedDangerBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ButtonBackgroundPressedDangerColor1}" Offset="0"/>
+        <GradientStop Color="{DynamicResource ButtonBackgroundPressedDangerColor2}" Offset="1"/>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="ButtonBorderHoverBrush" Color="{DynamicResource ButtonBorderHoverColor}"/>
+
+    <!-- Combobox-->
+    <SolidColorBrush x:Key="ComboboxDropDownBackgroundBrush" Color="{DynamicResource ComboboxDropDownBackgroundColor}"   />
+    <LinearGradientBrush x:Key="ComboboxArrowBackgroundBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ComboboxArrowsBackgroundColor}" Offset="0"/>
+        <GradientStop Color="{DynamicResource ComboboxArrowsBackgroundColor}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Checkbox   -->
+    <LinearGradientBrush x:Key="CheckboxIconBrush" StartPoint="0,0.5" EndPoint="1,0.5">
+        <GradientStop Color="{DynamicResource CheckboxIconColor}" Offset="0.204" />
+        <GradientStop Color="{DynamicResource CheckboxIconColor}" Offset="0.864" />
+    </LinearGradientBrush>
+
+
+    <!-- RadioButton -->
+    <LinearGradientBrush x:Key="RadioButtonIconBrush" StartPoint="0,0.5" EndPoint="1,0.5">
+        <GradientStop Color="{DynamicResource RadioButtonIconColor}" Offset="0.204" />
+        <GradientStop Color="{DynamicResource RadioButtonIconColor}" Offset="0.864" />
+    </LinearGradientBrush>
+
+    <!-- Scroll-->
+
+    <LinearGradientBrush x:Key="ScrollBarThumbBackgroundBrush" EndPoint="1,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ScrollBarThumbBackgroundColor1}" Offset="1"/>
+        <GradientStop Color="{DynamicResource ScrollBarThumbBackgroundColor2}"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ScrollBarThumbBackgroundPressedBrush" EndPoint="1,1" StartPoint="0,0">
+        <GradientStop Color="{DynamicResource ScrollBarThumbBackgroundPressedColor1}" Offset="1"/>
+        <GradientStop Color="{DynamicResource ScrollBarThumbBackgroundPressedColor2}"/>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="ScrollBarBrush"   Color="{DynamicResource ScrollBarColor}"/>
+    <SolidColorBrush x:Key="ScrollBarHoverBrush" Color="{DynamicResource ScrollBarHoverColor}"/>
+    <SolidColorBrush x:Key="ScrollBarPressedBrush" Color="{DynamicResource ScrollBarPressedColor}"/>
+    <SolidColorBrush x:Key="ScrollBarDisabledBrush" Color="{DynamicResource ScrollBarDisabledColor}"/>
+
+    <!-- DataGrid -->
+
+    <SolidColorBrush x:Key="DataGridRowBackgroundBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="DataGridRowAlternatingBackgroundBrush" Color="{DynamicResource DataGridRowAlternatingBackgroundColor}" />
+    <SolidColorBrush x:Key="DataGridRowBackgroundSelectBrush" Color="{DynamicResource DataGridRowBackgroundSelectColor}" />
+    <SolidColorBrush x:Key="DataGridRowForegroundSelectBrush" Color="{DynamicResource DataGridRowForeGroundSelectColor}" />
+    <SolidColorBrush x:Key="DataGridRowBackgroundHoverBrush" Color="{DynamicResource DataGridRowBackgroundHoverColor}" />
+
+    <LinearGradientBrush x:Key="DataGridHeaderColumnBackgroundBrush" EndPoint="0,0" StartPoint="0,1">
+        <GradientStop Color="{DynamicResource DataGridHeaderColumnBackgroundColor1}" Offset="1"/>
+        <GradientStop Color="{DynamicResource DataGridHeaderColumnBackgroundColor2}"/>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="DataGridHeaderColumnHoverBrush" Color="{DynamicResource DataGridHeaderColumnHoverColor}" />
+    <SolidColorBrush x:Key="DataGridHeaderColumnSelectColorBrush" Color="{DynamicResource DataGridHeaderColumnSelectColor}" />
+    <SolidColorBrush x:Key="DataGridHeaderColumnSeparatorBrush" Color="{DynamicResource DataGridHeaderColumnHoverColor}" />
+
+    <LinearGradientBrush x:Key="DataGridHeaderRowBrush" EndPoint="1,1" StartPoint="0,1">
+        <GradientStop Color="{DynamicResource DataGridHeaderRowColor1}" Offset="1"/>
+        <GradientStop Color="{DynamicResource DataGridHeaderRowColor2}"/>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="DataGridHeaderRowHoverBrush" Color="{DynamicResource DataGridHeaderRowHoverColor}" />
+    <SolidColorBrush x:Key="DataGridHeaderRowSelectBrush" Color="{DynamicResource DataGridHeaderRowSelectColor}" />
+
+    <SolidColorBrush x:Key="DataGridButtonAllBrush" Color="{DynamicResource DataGridButtonAllColor}" />
+    <SolidColorBrush x:Key="DataGridButtonIconBrush" Color="{DynamicResource DataGridButtonIconColor}" />
+
+    <!-- Calendar -->
+    <SolidColorBrush x:Key="CalendarNavigateForegroundBrush"  Color="{DynamicResource CalendarNavigateForegroundColor}" />
+    <SolidColorBrush x:Key="CalendarNavigateForegroundHoverBrush" Color="{DynamicResource CalendarNavigateForegroundHoverColor}" />
+
+    <LinearGradientBrush x:Key="CalendarTodayBackgroundBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop  Color="{DynamicResource CalendarTodayBackgroundColor}" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="CalendarTodayBorderBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop  Color="{DynamicResource CalendarTodayBorderColor}" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="CalendarBackgroundSelectedBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop  Color="{DynamicResource CalendarBackgroundSelectedColor}" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="CalendarBorderSelectedBrush" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop  Color="{DynamicResource CalendarBorderSelectedColor}" />
+    </LinearGradientBrush>
+
+    <!-- DatePicker -->
+    <SolidColorBrush x:Key="DatePickerIconBackgroundBrush" Color="{DynamicResource DatePickerIconBackgroundColor}"/>
+    <SolidColorBrush x:Key="DatePickerIconBackgroundHoverBrush" Color="{DynamicResource DatePickerIconBackgroundHoverColor}"/>
+    <SolidColorBrush x:Key="DatePickerIconForegroundBrush" Color="{DynamicResource DatePickerIconForegroundColor}"/>
+    <!--#endregion-->
+
+    <RadialGradientBrush x:Key="ControlBackgroundLineBrush">
+        <RadialGradientBrush.RelativeTransform>
+            <TransformGroup>
+                <ScaleTransform CenterX="0.5" CenterY="0.75" ScaleX="1.804" ScaleY="0.743" />
+                <SkewTransform CenterX="0.5" CenterY="0.75" />
+                <RotateTransform CenterX="0.5" CenterY="0.75" />
+                <TranslateTransform Y="0.47999998927116394" />
+            </TransformGroup>
+        </RadialGradientBrush.RelativeTransform>
+        <GradientStop Color="{DynamicResource BackgroundColor1}" Offset="0.009" />
+        <GradientStop Color="{DynamicResource BackgroundColor1}" Offset="1" />
+        <GradientStop Color="{DynamicResource BackgroundColor2}" Offset="0" />
+    </RadialGradientBrush>
+
+    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" x:Key="PressedBackgroundTabItem">
+        <GradientStop Color="#FF8E8E8C" Offset="0"/>
+        <GradientStop Color="#FF676767" Offset="1"/>
+    </LinearGradientBrush>
+
+    <Style x:Key="FocusLine_Occupado">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle SnapsToDevicePixels="True" Stroke="#ddd" StrokeDashArray="1 2" StrokeThickness="1" Margin="-1"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

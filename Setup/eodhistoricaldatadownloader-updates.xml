@@ -1,0 +1,13 @@
+<Program>
+<Name>EODHistoricalDataDownloader</Name>
+<PublishDate>02.02.2022</PublishDate>
+<Version name="2.0.0.0 beta">
+<Number>2.0.0.0</Number>
+<Date>02.02.2022</Date>
+<Description>
+New design.
+Added Intraday Historical Data API.
+</Description>
+<Link>https://eodhistoricaldata.com/download/Setup EODHistoricalDataDownloader.exe</Link>
+</Version>
+</Program>

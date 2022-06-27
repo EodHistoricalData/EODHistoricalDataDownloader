@@ -1,0 +1,140 @@
+﻿<Window x:Class="EODHistoricalDataDownloader.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"        
+        xmlns:vm="clr-namespace:EODHistoricalDataDownloader.ViewModel" 
+        mc:Ignorable="d"
+        Title="{Binding AppName}" Height="700" Width="1400" WindowStartupLocation="CenterScreen">
+
+    <Window.DataContext>
+        <vm:MainWindowVM/>
+    </Window.DataContext>
+
+    <Window.Resources>        
+        <Style x:Key="MenuButton" TargetType="Button" >
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundBrushEod}" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundBrash}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="5,5,5,5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="Black" Padding="10,0,0,0" >
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True" >
+                    <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundBrash}" />
+                    <Setter Property="Background" Value="{DynamicResource BackgroundEodButtonSelectBrush}" />
+                </Trigger>
+                <Trigger Property="IsEnabled"
+                         Value="False">
+                    <Setter Property="Background"
+                            Value="#F9AD5D" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="MenuIcon" TargetType="Path" >
+            <Setter Property="Height" Value="15" />
+            <Setter Property="Width" Value="15" />
+            <Setter Property="Stretch" Value="Fill" />
+            <Setter Property="Fill" Value="White" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="180" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel>
+            <StackPanel.Background>
+                <ImageBrush x:Name="ImageBrush"
+                            ImageSource="../Resources/eod_nav_background.png"
+                            Stretch="UniformToFill"
+                            AlignmentX="Left"/>
+            </StackPanel.Background>
+            <Button Style="{DynamicResource MenuButton}"
+                    Command="{Binding GoToEndOfDay}"
+                    Visibility="Visible"
+                    Cursor="Hand">
+                <StackPanel Orientation="Horizontal">
+                    <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource suitcaseStyle0}"  />
+                    <TextBlock Text="End of day historical data" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+
+            <Button Style="{DynamicResource MenuButton}" 
+                    Command="{Binding GoToIntraday}" Cursor="Hand"  >
+                <StackPanel Orientation="Horizontal" >
+                    <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource weather_sunStyle0}"  /> 
+                    <TextBlock Text="Intaday historical data" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+
+            <!--<Button Style="{DynamicResource MenuButton }" 
+                    Visibility="Visible"
+                    Command="{Binding GoToFundamental}" Cursor="Hand">
+                <StackPanel Orientation="Horizontal" >
+                    <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource currency_dollarStyle0}"  />
+                    <TextBlock Text="Fundamental data" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>-->
+
+            <!--<Button Style="{DynamicResource MenuButton}"
+                    Command="{Binding GoToTaskManager}"
+                    Visibility="Visible"
+                    Cursor="Hand">
+                <StackPanel Orientation="Horizontal" >
+                    <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource man_suitcase_runStyle0}"  />
+                    <TextBlock Text="Task Manager" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>-->
+
+        </StackPanel>
+
+        <StackPanel VerticalAlignment="Bottom">
+            <Button VerticalAlignment="Bottom" 
+                    Style="{DynamicResource MenuButton}" 
+                    Command="{Binding GoToSettings}"
+                    Cursor="Hand">
+                <StackPanel Orientation="Horizontal" >
+                    <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource settingsStyle0}"  />
+                    <TextBlock Text="Settings" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+            <Button Style="{DynamicResource MenuButton}" 
+                    Visibility="Visible"
+                    Command="{Binding GoToAbout}" Cursor="Hand" >
+                <StackPanel Orientation="Horizontal">
+                    <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource input_questionStyle0}"  />
+                    <TextBlock Text="About" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+            <Button 
+                    Style="{DynamicResource MenuButton}" 
+                    Command="{Binding Exit}" Cursor="Hand" >
+                <StackPanel Orientation="Horizontal" >
+                    <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource door_leaveStyle0}"  />
+                    <TextBlock Text="Exit" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <Frame 
+            x:Name="Page"
+            Grid.Column="1" 
+            Content="{Binding CurrentPage}"
+            NavigationUIVisibility="Hidden"
+        />
+    </Grid>
+</Window>

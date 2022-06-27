@@ -1,0 +1,148 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Brushes https://colorscheme.ru/#33326w0w3w0w0 -->
+
+    <!--#region Palette -->
+
+    <system:String x:Key="ToggleButtonGO">GO</system:String>
+
+    <Color x:Key="ColorEod1">#F8835B</Color>
+    <Color x:Key="ColorEod2">#F9AD5D</Color>
+    <Color x:Key="ColorEod3">#F8835B</Color>
+    <Color x:Key="ColorEodButton">#F05F40</Color>
+    <Color x:Key="ColorEodButtonSelected">#f54d2a</Color>
+
+    <Color x:Key="ColorEodButtonPage1">#03273c</Color>
+    <Color x:Key="ColorEodButtonPage2">#041b29</Color>
+    
+    <Color x:Key="ColorEodButtonPageSelected1">#1f1109</Color>
+    <Color x:Key="ColorEodButtonPageSelected2">#241207</Color>
+
+    <Color x:Key="ColorBase1">#f54d2a</Color>
+    <Color x:Key="ColorBase2">#F05F40</Color>
+    <Color x:Key="ColorBase3">#F8835B</Color>
+    <Color x:Key="ColorBase4">#F8835B</Color>
+    <Color x:Key="ColorBase5">#F9AD5D</Color>
+
+    <Color x:Key="ColorA1">#A66E00</Color>
+    <Color x:Key="ColorA2">#BF8F30</Color>
+    <Color x:Key="ColorA3">#FFA900</Color>
+    <Color x:Key="ColorA4">#FFBE40</Color>
+    <Color x:Key="ColorA5">#FFCF73</Color>
+
+    <Color x:Key="ColorB1">#860049</Color>
+    <Color x:Key="ColorB2">#9B2766</Color>
+    <Color x:Key="ColorB3">#CE0071</Color>
+    <Color x:Key="ColorB4">#E73A98</Color>
+    <Color x:Key="ColorB5">#E768AD</Color>
+
+    <Color x:Key="ColorN1">#FF707070</Color>
+    <Color x:Key="ColorN2">#FF8B8B8B</Color>
+    <Color x:Key="ColorN3">#FFABABAB</Color>
+    <Color x:Key="ColorN4">#FFCBCBCB</Color>
+    <Color x:Key="ColorN5">#FFE3E3E3</Color>
+    <Color x:Key="ColorN6">#F0F0F0</Color>
+
+    <!--#endregion-->
+
+    <Color x:Key="ForegroundColor">Black</Color>
+    <Color x:Key="ForegroundHoverColor">Black</Color>
+    <Color x:Key="ForegroundDisabledColor">#FF474747</Color>
+    <Color x:Key="BackgroundColor1">White</Color>
+    <!--<Color x:Key="BackgroundColor2">#F0F0F0</Color>-->
+    <Color x:Key="BackgroundColor2">#ffd4a6</Color>
+    <!--#region ControlsColors -->
+
+    <!-- Standart -->
+    <Color x:Key="ForegroundControlColor" >Black</Color>
+    <Color x:Key="BackgroundControlColor1">White</Color>
+    <Color x:Key="BackgroundControlColor2">#F0F0F0</Color>
+    <Color x:Key="BackgroundControlDisabledColor1">#FFCBCBCB</Color>
+    <Color x:Key="BackgroundControlDisabledColor2">#FFE3E3E3</Color>
+    <Color x:Key="BackgroundControlDisabledColor3">#F0F0F0</Color>
+    <Color x:Key="BorderColor">#f54d2a</Color>
+    <Color x:Key="BorderHoverColor" >#F8835B</Color>
+    <Color x:Key="BorderDisabledColor">#FF707070</Color>
+
+    <!-- Button -->
+    <Color x:Key="ButtonForegroundColor">White</Color>
+    <Color x:Key="ButtonBackgroundColor1" >#F05F40</Color>
+    <Color x:Key="ButtonBackgroundColor2" >#F05F40</Color>
+    <Color x:Key="ButtonBackgroundDangerColor1">#FF0000</Color>
+    <Color x:Key="ButtonBackgroundDangerColor2">#FF0000</Color>
+    <Color x:Key="ButtonBackgroundHoverColor1" >#f54d2a</Color>
+    <Color x:Key="ButtonBackgroundHoverColor2">#f54d2a</Color>
+    <Color x:Key="ButtonBackgroundHoverDangerColor1">#A60000</Color>
+    <Color x:Key="ButtonBackgroundHoverDangerColor2">#A60000</Color>
+    <Color x:Key="ButtonBackgroundPressedColor1">#F8835B</Color>
+    <Color x:Key="ButtonBackgroundPressedColor2">#F8835B</Color>
+    <Color x:Key="ButtonBackgroundPressedDangerColor1">#FF7373</Color>
+    <Color x:Key="ButtonBackgroundPressedDangerColor2">#FF7373</Color>
+    <Color x:Key="ButtonBorderHoverColor">#f54d2a</Color>
+
+    <!-- Checkbox -->
+    <Color x:Key="CheckboxIconColor">#f54d2a</Color>
+
+    <!-- RadioButton -->
+    <Color x:Key="RadioButtonIconColor" >#f54d2a</Color>
+
+    <!-- Combobox -->
+    <Color x:Key="ComboboxArrowsBackgroundColor">#FFCBCBCB</Color>
+    <Color x:Key="ComboboxArrowsColor">#FF8B8B8B</Color>
+    <Color x:Key="ComboboxArrowsHoverColor">#FF505050</Color>
+    <Color x:Key="ComboboxArrowsDisabledColor">#FF8B8B8B</Color>
+    <Color x:Key="ComboboxDropDownBackgroundColor">#F0F0F0</Color>
+    <Color x:Key="ComboboxDropDownBackgroundHoverColor">#F9AD5D</Color>
+    <Color x:Key="ComboboxDropDownForegroundDisabledColor">#FFE3E3E3</Color>
+
+    <!-- Scroll-->
+    <Color x:Key="ScrollBarThumbBackgroundColor1">#F8835B</Color>
+    <Color x:Key="ScrollBarThumbBackgroundColor2">#F8835B</Color>
+    <Color x:Key="ScrollBarThumbBackgroundPressedColor1">#F8835B</Color>
+    <Color x:Key="ScrollBarThumbBackgroundPressedColor2">#F8835B</Color>
+    <Color x:Key="ScrollBarColor">#FFA1A1A1</Color>
+    <Color x:Key="ScrollBarHoverColor">#F8835B</Color>
+    <Color x:Key="ScrollBarPressedColor" >#f54d2a</Color>
+    <Color x:Key="ScrollBarDisabledColor">#FF404040</Color>
+
+    <!-- DataGrid -->
+    <Color x:Key="DataGridRowAlternatingBackgroundColor">#FFE3E3E3</Color>
+    <Color x:Key="DataGridRowBackgroundSelectColor">#F8835B</Color>
+    <Color x:Key="DataGridRowForeGroundSelectColor">Black</Color>
+    <Color x:Key="DataGridRowBackgroundHoverColor">#c7f0de</Color>
+    <Color x:Key="DataGridHeaderColumnBackgroundColor1">#FFB5B5B5</Color>
+    <Color x:Key="DataGridHeaderColumnBackgroundColor2">#FF878585</Color>
+
+    <Color x:Key="DataGridHeaderColumnHoverColor">#FFCBCBCB</Color>
+    <Color x:Key="DataGridHeaderColumnSelectColor">#FF939393</Color>
+
+    <Color x:Key="DataGridHeaderRowColor1">#FFABABAB</Color>
+    <Color x:Key="DataGridHeaderRowColor2">#FFCBCBCB</Color>
+    <Color x:Key="DataGridHeaderRowHoverColor">#FFABABAB</Color>
+    <Color x:Key="DataGridHeaderRowSelectColor">#FF707070</Color>
+
+    <Color x:Key="DataGridButtonAllColor">#FFCBCBCB</Color>
+    <Color x:Key="DataGridButtonIconColor">#FF707070</Color>
+
+    <!-- Calendar -->
+    <Color x:Key="CalendarMonthsColor">Black</Color>
+    <Color x:Key="CalendarNavigateForegroundColor" >#f54d2a</Color>
+    <Color x:Key="CalendarNavigateForegroundHoverColor">#F9AD5D</Color>
+    <Color x:Key="CalendarDaysAnoverMonthForegroundColor">#FFABABAB</Color>
+    <Color x:Key="CalendarTodayBackgroundColor">#FFAD8F56</Color>
+    <Color x:Key="CalendarTodayBorderColor">#FF585858</Color>
+    <Color x:Key="CalendarBackgroundSelectedColor" >#f54d2a</Color>
+    <Color x:Key="CalendarBorderSelectedColor">#F8835B</Color>
+    <Color x:Key="CalendarForegroundSelectedColor">White</Color>
+
+    <!-- DatePicker -->
+    <Color x:Key="DatePickerIconBackgroundColor">#FF8B8B8B</Color>
+    <Color x:Key="DatePickerIconBackgroundHoverColor" >#f54d2a</Color>
+    <Color x:Key="DatePickerIconForegroundColor">White</Color>
+
+    <!--#endregion-->
+
+
+</ResourceDictionary>

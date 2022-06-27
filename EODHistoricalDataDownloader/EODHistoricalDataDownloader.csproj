@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>annotations</Nullable>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Images\ico\appIcon.ico</ApplicationIcon>
+    <AnalysisLevel>6.0</AnalysisLevel>
+    <PackageIcon>images.png</PackageIcon>
+    <Version>2.0.3</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="source\**" />
+    <EmbeddedResource Remove="source\**" />
+    <None Remove="source\**" />
+    <Page Remove="source\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="logo.png" />
+    <None Remove="Resources\eod_nav_background.png" />
+    <None Remove="View\20170130_004214.jpg" />
+    <None Remove="View\mainWindowIcon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Images\ico\appIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EODHistoricalData.Wrapper" Version="1.2.2" />
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\eod_nav_background.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

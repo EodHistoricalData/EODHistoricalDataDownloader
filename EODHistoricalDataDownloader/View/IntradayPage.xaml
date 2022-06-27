@@ -1,0 +1,96 @@
+﻿<Page x:Class="EODHistoricalDataDownloader.View.IntradayPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:vm="clr-namespace:EODHistoricalDataDownloader.ViewModel"
+      xmlns:view="clr-namespace:EODHistoricalDataDownloader.View"
+      xmlns:convert="clr-namespace:EODHistoricalDataDownloader.Converters"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Intraday Historical Data"
+      Style="{DynamicResource PageStyle}">
+
+    <Page.DataContext>
+        <vm:IntradayPageVM/>
+    </Page.DataContext>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition Width="220"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <view:TikersLoadingControl Grid.Column="0" DataContext="{Binding TikersLoadingControlVM}">
+        </view:TikersLoadingControl>
+
+        <StackPanel Grid.Column="1" Orientation="Vertical" >
+
+            <Label Margin="0,4,0,0" >Interval:</Label>
+            <ComboBox Name="cbxInterval" ItemsSource="{Binding ListOfInterval}" SelectedItem="{Binding Interval}">
+            </ComboBox>
+            <StackPanel Orientation="Horizontal">
+                <CheckBox  Name="cbxAllAvailable"
+                           Margin="0,4,0,0"
+                           Content="All available"
+                           IsChecked="{Binding AllAvailable}" Click="CbxAllAvailable_Click"/>
+                <CheckBox  Margin="0,4,0,0"
+                           Content="Update"
+                           IsChecked="{Binding IsUpdate}"></CheckBox>
+            </StackPanel>
+
+            <Label Margin="0,4,0,0"
+                   Name="lFrom">From:</Label>
+            <DatePicker  Name="dtFrom"                          
+                         SelectedDate="{Binding DateFrom}" 
+                         SelectedDateFormat="Long"></DatePicker>
+            <Label Margin="0,4,0,0"
+                   Name="lTo">To:</Label>
+            <DatePicker  Name="dtTo"                          
+                         SelectedDate="{Binding DateTo}" 
+                         SelectedDateFormat="Long"></DatePicker>
+
+            <Label  Margin="0,4,0,0"  Content="Download directory: " HorizontalContentAlignment="Left"></Label>
+            <WrapPanel Orientation="Horizontal" >
+
+                <TextBox Width="170" Name="tbxPath" Text="{Binding FilePath}"></TextBox>
+                <Button   Margin="4"           
+                          Style="{DynamicResource MenuButton}" 
+                          Cursor="Hand"
+                          Command="{Binding SelectFilePath}">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource folderStyle0}" />
+                        <TextBlock Text="" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </WrapPanel>
+            <StackPanel>
+                <CheckBox IsChecked="{Binding OneFile}" Margin="4" Content="All tickers in one file"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+                <Button HorizontalAlignment="Right" Margin="4"
+                    Style="{DynamicResource MenuButton}"
+                    Command="{Binding LoadToCsvFiles}"
+                    Visibility="Visible"
+                    Cursor="Hand">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="Load to csv" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,6,6,6"/>
+                        <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource page_searchStyle0}"  />
+                    </StackPanel>
+                </Button>
+
+                <Button HorizontalAlignment="Right" Margin="4"
+                    Style="{DynamicResource MenuButton}"
+                    Command="{Binding CancelSavingFiles}"
+                    Visibility="Visible"
+                    Cursor="Hand">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="Cancel" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,6,6,6"/>
+                        <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource stopStyle0}"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+
+    </Grid>
+</Page>
