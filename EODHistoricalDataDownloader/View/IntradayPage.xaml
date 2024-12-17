@@ -30,10 +30,6 @@
             <ComboBox Name="cbxInterval" ItemsSource="{Binding ListOfInterval}" SelectedItem="{Binding Interval}">
             </ComboBox>
             <StackPanel Orientation="Horizontal">
-                <CheckBox  Name="cbxAllAvailable"
-                           Margin="0,4,0,0"
-                           Content="All available"
-                           IsChecked="{Binding AllAvailable}" Click="CbxAllAvailable_Click"/>
                 <CheckBox  Margin="0,4,0,0"
                            Content="Update"
                            IsChecked="{Binding IsUpdate}"></CheckBox>
@@ -85,7 +81,7 @@
                     Visibility="Visible"
                     Cursor="Hand">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <TextBlock Text="Cancel" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,6,6,6"/>
+                        <TextBlock Text="Stop" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,6,6,6"/>
                         <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource stopStyle0}"/>
                     </StackPanel>
                 </Button>

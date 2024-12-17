@@ -2,7 +2,9 @@
 using EODHistoricalDataDownloader.Program;
 using EODHistoricalDataDownloader.Utils;
 using EODHistoricalDataDownloader.View;
+using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -129,11 +131,18 @@ namespace EODHistoricalDataDownloader.ViewModel
             {
                 return new DelegateCommand((obj) =>
                 {
-                    if (EndOfDayPage == null)
+                    try
                     {
-                        EndOfDayPage = new EndOfDayPage();
+                        if (EndOfDayPage == null)
+                        {
+                            EndOfDayPage = new EndOfDayPage();
+                        }
+                        CurrentPage = EndOfDayPage;
                     }
-                    CurrentPage = EndOfDayPage;
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 },
                 (obj) =>
                 {
@@ -147,11 +156,18 @@ namespace EODHistoricalDataDownloader.ViewModel
             {
                 return new DelegateCommand((obj) =>
                 {
-                    if (IntradayPage == null)
+                    try
                     {
-                        IntradayPage = new IntradayPage();
+                        if (IntradayPage == null)
+                        {
+                            IntradayPage = new IntradayPage();
+                        }
+                        CurrentPage = IntradayPage;
                     }
-                    CurrentPage = IntradayPage;
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 },
                 (obj) =>
                 {

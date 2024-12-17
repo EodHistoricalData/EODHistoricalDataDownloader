@@ -7,7 +7,7 @@
        xmlns:view="clr-namespace:EODHistoricalDataDownloader.View"
        xmlns:convert="clr-namespace:EODHistoricalDataDownloader.Converters"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="850"
+      d:DesignHeight="450" d:DesignWidth="800"
       Title="EndOfDayPage"
       Style="{DynamicResource PageStyle}" >
 
@@ -35,10 +35,6 @@
             <ComboBox ItemsSource="{Binding ListOfPeriod}" SelectedItem="{Binding Period}"/>
 
             <StackPanel Orientation="Horizontal">
-                <CheckBox  Name="cbxAllAvailable"
-                           Margin="0,4,0,0"
-                           Content="All available"
-                           IsChecked="{Binding AllAvailable}" Click="CbxAllAvailable_Click"></CheckBox>
                 <CheckBox  Margin="0,4,0,0"
                            Content="Update"
                            IsChecked="{Binding IsUpdate}"></CheckBox>
@@ -81,7 +77,7 @@
                     Visibility="Visible"
                     Cursor="Hand">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <TextBlock Text="Load to csv files" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,6,6,6"/>
+                        <TextBlock Text="Load to csv" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,6,6,6"/>
                         <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource page_searchStyle0}"  />
                     </StackPanel>
                 </Button>
@@ -92,7 +88,7 @@
                     Visibility="Visible"
                     Cursor="Hand">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <TextBlock Text="Cancel" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,6,6,6"/>
+                        <TextBlock Text="Stop" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,6,6,6"/>
                         <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource stopStyle0}"/>
                     </StackPanel>
                 </Button>

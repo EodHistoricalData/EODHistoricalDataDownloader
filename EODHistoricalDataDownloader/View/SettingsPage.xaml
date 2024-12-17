@@ -35,23 +35,23 @@
 
         <Label Grid.Column="0" Content="Simultaneously connections: " HorizontalContentAlignment="Right" Grid.Row="2"/>
         <StackPanel Grid.Column="1" Grid.Row="2" >
-            
+
             <TextBox Margin="5,5,0,0" HorizontalAlignment="Left" Width="70" Text="{Binding MaxThreads}"
                  TextAlignment="Center" PreviewTextInput="MaxThreads_PreviewTextInput" PreviewKeyDown="MaxThreads_PreviewKeyDown"/>
-			<TextBlock  Background="White" Margin="5">
-				<Run Text="no more than" />
-				<Run Text="{Binding MaxThreadsReccomend, Mode=OneWay}" />
-				<Run Text="connections are recommended " />
-			</TextBlock>
-		</StackPanel>
-        
+            <TextBlock Foreground="#FFF54D2A" Background="Transparent" Margin="5">
+				<Run Text="More than"/>
+				<Run Text="{Binding MaxThreadsRecommended, Mode=OneWay}"/>
+				<Run Text="connections are not recommended"/>
+            </TextBlock>
+        </StackPanel>
+
         <Label Grid.Column="0" Content="Use proxy: " HorizontalContentAlignment="Right" Grid.Row="3"/>
         <CheckBox Name="cbx_UseProxy" Grid.Column="1" Grid.Row="3" Margin="7" IsChecked="{Binding UseProxy}"/>
 
         <Label Grid.Column="0" Content="IP address/name and port number:" HorizontalContentAlignment="Right" Grid.Row="4" VerticalAlignment="Stretch"/>
         <StackPanel Grid.Column="1" Grid.Row="4">
             <TextBox Margin="5,0,0,0" HorizontalAlignment="Stretch" Text="{Binding ProxyHost}" VerticalAlignment="Top" HorizontalContentAlignment="Left"/>
-            <Label Content="Example: localhost: 8080" IsManipulationEnabled="True" Background="White"/>
+            <Label Content="Example: localhost: 8080" IsManipulationEnabled="True" Background="Transparent"/>
         </StackPanel>
 
         <Label Grid.Column="0" Content="With credentials" HorizontalContentAlignment="Right" Grid.Row="5" VerticalAlignment="Stretch"/>
@@ -64,35 +64,17 @@
         <Label Grid.Column="0" Grid.Row="7" Content="Password:" IsManipulationEnabled="True" HorizontalContentAlignment="Right"/>
         <TextBox Grid.Column="1" Grid.Row="7" Margin="5" Width="300" HorizontalContentAlignment="Left" HorizontalAlignment="Left"
                  Text="{Binding ProxyPassword}"/>
+        <Button Grid.Column="1" Grid.Row="8"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Left"
+                Margin="5"
+                Style="{DynamicResource MenuButton}"
+                Command="{Binding SaveSettings}"
+                Cursor="Hand">
+            <StackPanel Orientation="Horizontal" >
+                <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource saveStyle0}"  />
+                <TextBlock Text="Save" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            </StackPanel>
+        </Button>
     </Grid>
-
-    <!--<TabControl >
-            <TabItem Header="Connection"></TabItem>
-            <TabItem Header="Api key">
-                <Grid>
-                   
-                   
-                </Grid>
-
-            </TabItem>
-            <TabItem Header="Logging"></TabItem>
-            <TabItem Header="Paths">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="30"></ColumnDefinition>                      
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="30"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="20"></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition Height="20"></RowDefinition>
-                    </Grid.RowDefinitions>
-
-                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical">
-                       
-            </TabItem>
-            <TabItem Header="General references"></TabItem>
-        </TabControl>-->
 </Page>

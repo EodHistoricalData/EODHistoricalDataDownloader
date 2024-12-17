@@ -97,19 +97,6 @@ namespace EODHistoricalDataDownloader.ViewModel
 
         public bool OneFile { get; set; }
 
-        public bool AllAvailable
-        {
-            get => _allAvailable;
-            set
-            {
-                _allAvailable = value;
-                OnPropertyChanged(nameof(AllAvailable));
-                Settings.SettingsFields.IntradayAllAvailable = AllAvailable;
-                Settings.Save();
-            }
-        }
-        private bool _allAvailable = Settings.SettingsFields.IntradayAllAvailable;
-
         public WebProxy Proxy
         {
             get => _proxy;

@@ -33,7 +33,7 @@
 
 [Setup]
 ;Подписывание кода
-SignTool=byparam {#SignTool} sign /a /n $q{#SingNameSSL}$q /t http://timestamp.comodoca.com/authenticode /d $q{#MyAppName}$q $f
+;SignTool=byparam {#SignTool} sign /a /n $q{#SingNameSSL}$q /t http://timestamp.comodoca.com/authenticode /d $q{#MyAppName}$q $f
 
 ;Использовать сгенерируемый VS GUI
 AppId           = {{AE85539E-2BFA-44C9-9153-A2A036BB5AA8}}

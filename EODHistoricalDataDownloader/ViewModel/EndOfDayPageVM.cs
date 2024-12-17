@@ -100,19 +100,6 @@ namespace EODHistoricalDataDownloader.ViewModel
         }
         private bool _isUpdate = Settings.SettingsFields.EndOfDayIsUpdate;
 
-        public bool AllAvailable
-        {
-            get => _allAvailable;
-            set
-            {
-                _allAvailable = value;
-                OnPropertyChanged(nameof(AllAvailable));
-                Settings.SettingsFields.EndOfDayAllAvailable = AllAvailable;
-                Settings.Save();
-            }
-        }
-        private bool _allAvailable = Settings.SettingsFields.EndOfDayAllAvailable;
-
         public WebProxy Proxy
         {
             get => _proxy;
