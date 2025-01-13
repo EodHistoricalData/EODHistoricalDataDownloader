@@ -62,8 +62,8 @@
     <Color x:Key="BackgroundControlDisabledColor1">#FFCBCBCB</Color>
     <Color x:Key="BackgroundControlDisabledColor2">#FFE3E3E3</Color>
     <Color x:Key="BackgroundControlDisabledColor3">#F0F0F0</Color>
-    <Color x:Key="BorderColor">#f54d2a</Color>
-    <Color x:Key="BorderHoverColor" >#F8835B</Color>
+    <Color x:Key="BorderColor">#0D273A</Color>
+    <Color x:Key="BorderHoverColor" >#74AACC</Color>
     <Color x:Key="BorderDisabledColor">#FF707070</Color>
 
     <!-- Button -->
@@ -142,6 +142,12 @@
     <Color x:Key="DatePickerIconBackgroundHoverColor" >#f54d2a</Color>
     <Color x:Key="DatePickerIconForegroundColor">White</Color>
 
+    <!--#endregion-->
+    
+    <!--#region NEW-->
+    <Color x:Key="GraghiteMain">#0D273A</Color>
+    <Color x:Key="GraghiteSecondary">#3D5261</Color>
+    <Color x:Key="GraghiteSelection">#74AACC</Color>
     <!--#endregion-->
 
 

@@ -31,14 +31,14 @@
         </Grid.ColumnDefinitions>
 
         <Label Grid.Column="0" Content="Api key: " HorizontalContentAlignment="Right" Grid.Row="1"/>
-        <TextBox Grid.Column="1" Grid.Row="1" Margin="5" Text="{Binding APIKey}"></TextBox>
+        <TextBox Grid.Column="1" Grid.Row="1" Margin="5" Width="300" HorizontalAlignment="Left" Text="{Binding APIKey}"></TextBox>
 
         <Label Grid.Column="0" Content="Simultaneously connections: " HorizontalContentAlignment="Right" Grid.Row="2"/>
         <StackPanel Grid.Column="1" Grid.Row="2" >
 
             <TextBox Margin="5,5,0,0" HorizontalAlignment="Left" Width="70" Text="{Binding MaxThreads}"
                  TextAlignment="Center" PreviewTextInput="MaxThreads_PreviewTextInput" PreviewKeyDown="MaxThreads_PreviewKeyDown"/>
-            <TextBlock Foreground="#FFF54D2A" Background="Transparent" Margin="5">
+            <TextBlock Background="Transparent" Margin="5">
 				<Run Text="More than"/>
 				<Run Text="{Binding MaxThreadsRecommended, Mode=OneWay}"/>
 				<Run Text="connections are not recommended"/>
@@ -50,7 +50,7 @@
 
         <Label Grid.Column="0" Content="IP address/name and port number:" HorizontalContentAlignment="Right" Grid.Row="4" VerticalAlignment="Stretch"/>
         <StackPanel Grid.Column="1" Grid.Row="4">
-            <TextBox Margin="5,0,0,0" HorizontalAlignment="Stretch" Text="{Binding ProxyHost}" VerticalAlignment="Top" HorizontalContentAlignment="Left"/>
+            <TextBox Margin="5,0,0,0" HorizontalAlignment="Left" Width="300" Text="{Binding ProxyHost}" VerticalAlignment="Top" HorizontalContentAlignment="Left"/>
             <Label Content="Example: localhost: 8080" IsManipulationEnabled="True" Background="Transparent"/>
         </StackPanel>
 
@@ -68,7 +68,7 @@
                 VerticalAlignment="Top"
                 HorizontalAlignment="Left"
                 Margin="5"
-                Style="{DynamicResource MenuButton}"
+                Style="{DynamicResource LoadButton}"
                 Command="{Binding SaveSettings}"
                 Cursor="Hand">
             <StackPanel Orientation="Horizontal" >

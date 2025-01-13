@@ -26,6 +26,8 @@ namespace EODHistoricalDataDownloader.ViewModel
         readonly CancellationTokenSource source = new();
 
         public static List<string> ListOfInterval { get; set; } = new() { "1 minute", "5 minutes", "1 hour" };
+        public static List<string> ListOfFormat { get; set; } = new() { "Metastock", "Amibroker" };
+        public static List<string> ListOfOutput { get; set; } = new() { "All in one file", "Separate files" };
 
         public string Interval
         {
@@ -39,6 +41,32 @@ namespace EODHistoricalDataDownloader.ViewModel
             }
         }
         private string _interval = Settings.SettingsFields.IntradayInterval;
+
+        public string? Format
+        {
+            get => _format;
+            set
+            {
+                _format = value;
+                OnPropertyChanged(nameof(Format));
+                Settings.SettingsFields.IntradayFormat = Format;
+                Settings.Save();
+            }
+        }
+        private string? _format = Settings.SettingsFields.IntradayFormat;
+
+        public string? Output
+        {
+            get => _output;
+            set
+            {
+                _output = value;
+                OnPropertyChanged(nameof(Output));
+                Settings.SettingsFields.IntradayOutput = Output;
+                Settings.Save();
+            }
+        }
+        private string? _output = Settings.SettingsFields.IntradayOutput;
 
         public DateTime DateFrom
         {
@@ -94,8 +122,6 @@ namespace EODHistoricalDataDownloader.ViewModel
             }
         }
         private bool _isUpdate = Settings.SettingsFields.IntradayIsUpdate;
-
-        public bool OneFile { get; set; }
 
         public WebProxy Proxy
         {
@@ -197,7 +223,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                         }
                     var proxy = Proxy;
                     bool isUpdate = IsUpdate;
-                    bool oneFile = OneFile;
+                    bool oneFile = Output == "All in one file";
                     var loader = new IntradayLoader(apiKey, loadingStatuses, interval, dateFrom, dateTo, maxThreads, proxy, isUpdate, oneFile);
                     Task.Run(() => loader.LoadToCsv(filePath, source), source.Token);
                 },

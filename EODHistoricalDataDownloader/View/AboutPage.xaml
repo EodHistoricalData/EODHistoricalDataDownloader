@@ -20,29 +20,45 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" Height="340">
-            <Image  x:Name="logo" HorizontalAlignment="Left" 
-                    Height="70" Width="325"
-                    Stretch="Uniform" 
-                    Source="/logo.png"
-                    Margin="0,0,0,15" >
-            </Image>
-            <TextBlock>           
-                  <Run> The desktop application for EODHistoricalData Financial APIs.</Run>
-                  <LineBreak></LineBreak>
-                <Run Text="Application for downloading End Of Day Data from"/>                
-                <Hyperlink Cursor="Hand">
-                    <Run Text="eodhistoricaldata.com"/>
-                </Hyperlink>
-                <Run Text="."/>
-                <LineBreak></LineBreak>
-                <LineBreak></LineBreak>
-                    <Run>  With our Downloader application, it’s easy to download even the entire US stock market,
-                        with more than 47,000 active tickers we track, just with one click.
-                    </Run>
-            </TextBlock>
-            <StackPanel Orientation="Horizontal" Margin="0,15">
-                <TextBlock>Version: 2.0.0</TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <Image  x:Name="logo"
+                        Margin="10"
+                        HorizontalAlignment="Left"
+                        Height="79" Width="79"
+                        Stretch="Uniform" 
+                        Source="/Images/png/Logo stripped.png">
+                </Image>
+                <Image  x:Name="group"
+                        Margin="10"
+                        HorizontalAlignment="Left"
+                        Height="79" Width="79"
+                        Stretch="Uniform" 
+                        Source="/Images/png/Group 33575.png">
+                </Image>
             </StackPanel>
+            <TextBlock TextWrapping="Wrap">
+                <Run>The application, developed by </Run>
+                <Hyperlink Cursor="Hand" Click="Hyperlink_Click">
+                    <Run Text="eodhd.com"/>
+                </Hyperlink>
+                <Run>, is designed to download financial data on Windows OS.</Run>
+                <LineBreak></LineBreak>
+                <LineBreak></LineBreak>
+                <Run>With this app, it's easy to download data for multiple tickers or entire exchanges at once.</Run>
+                <LineBreak></LineBreak>
+                <LineBreak></LineBreak>
+                <Run>Although the app is free and works with a "demo" API key by default, you can gain access to more data
+                    by signing up on eodhd.com for free or choosing one of the more advanced plans. Learn more about EODHD plans </Run>
+                <Hyperlink Cursor="Hand" Click="Hyperlink_Click_1">
+                    <Run Text="here."/>
+                </Hyperlink>
+                <LineBreak></LineBreak>
+                <LineBreak></LineBreak>
+                <Run>Support: </Run>
+                <Hyperlink Cursor="Hand" Click="Hyperlink_Click_2">
+                    <Run Text="support@eodhistoricaldata.com"/>
+                </Hyperlink>
+            </TextBlock>
         </StackPanel>
     </Grid>
 </Page>

@@ -26,6 +26,8 @@ namespace EODHistoricalDataDownloader.ViewModel
         readonly CancellationTokenSource source = new();
 
         public static List<string> ListOfPeriod { get; set; } = new() { "Daily", "Weekly", "Monthly" };
+        public static List<string> ListOfFormat { get; set; } = new() { "Metastock", "Amibroker" };
+        public static List<string> ListOfOutput { get; set; } = new() { "All in one file", "Separate files" };
 
         public string? Period
         {
@@ -39,6 +41,32 @@ namespace EODHistoricalDataDownloader.ViewModel
             }
         }
         private string? _period = Settings.SettingsFields.EndOfDayPeriod;
+
+        public string? Format
+        {
+            get => _format;
+            set
+            {
+                _format = value;
+                OnPropertyChanged(nameof(Format));
+                Settings.SettingsFields.EndOfDayFormat = Format;
+                Settings.Save();
+            }
+        }
+        private string? _format = Settings.SettingsFields.EndOfDayFormat;
+
+        public string? Output
+        {
+            get => _output;
+            set
+            {
+                _output = value;
+                OnPropertyChanged(nameof(Output));
+                Settings.SettingsFields.EndOfDayOutput = Output;
+                Settings.Save();
+            }
+        }
+        private string? _output = Settings.SettingsFields.EndOfDayOutput;
 
         public DateTime DateFrom
         {
@@ -81,11 +109,6 @@ namespace EODHistoricalDataDownloader.ViewModel
             }
         }
         private string _filePath = Settings.SettingsFields.EndOfDayFilePath;
-
-        /// <summary>
-        /// save tickers in one file
-        /// </summary>
-        public bool OneFile { get; set; }
 
         public bool IsUpdate
         {
@@ -201,7 +224,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                         }
                     var proxy = Proxy;
                     bool isUpdate = IsUpdate;
-                    bool oneFile = OneFile;
+                    bool oneFile = Output == "All in one file";
                     var loader = new EndOfDayLoader(apiKey, loadingStatuses, historicalPeriod, dateFrom, dateTo, maxThreads, proxy, isUpdate, oneFile);
                     Task.Run(() => loader.LoadToCsv(filePath, source), source.Token);
                 },

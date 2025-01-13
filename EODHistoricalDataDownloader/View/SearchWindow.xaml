@@ -20,7 +20,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" Width="auto">
-            <Button  Margin="5,0,0,0" Style="{DynamicResource MenuButton}" Focusable="False">
+            <Button  Margin="5,0,0,0" Style="{DynamicResource LoadButton}" Focusable="False">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource page_searchStyle0}" />
                 </StackPanel>
@@ -51,12 +51,11 @@
             </DataGrid>
         </ScrollViewer>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" >
-            <Button  Width="100" 
-                     Margin="4"
-                     Style="{StaticResource MenuButton}" 
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,2,0">
+            <Button  Width="130"
+                     Style="{StaticResource LoadButton}" 
                      Command="{Binding AddTickers}">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource addStyle0}" />
                     <TextBlock Text="Add tickers"
                                VerticalAlignment="Center" 

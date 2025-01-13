@@ -10,6 +10,8 @@ namespace EODHistoricalDataDownloader.View
         public SearchWindow()
         {
             InitializeComponent();
+
+            UpdateLayout();
         }
     }
 }
