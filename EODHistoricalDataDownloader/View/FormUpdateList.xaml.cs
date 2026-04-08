@@ -59,7 +59,9 @@ namespace EODHistoricalDataDownloader.View
             fileName = Path.GetTempPath() + linksplit[linksplit.Length - 1];
             if (File.Exists(fileName)) File.Delete(fileName);
 
+#pragma warning disable SYSLIB0014 // Тип или член устарел
             WebClient client = new();
+#pragma warning restore SYSLIB0014 // Тип или член устарел
             client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(DownloadProgressChanged);
             client.DownloadFileCompleted += new AsyncCompletedEventHandler(DownloadFileCompleted);
             client.DownloadFileAsync(new System.Uri(Versions[0].Link), fileName);

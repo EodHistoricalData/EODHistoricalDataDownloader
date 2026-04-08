@@ -13,11 +13,11 @@
 #define MyAppVersion   GetFileVersion(FilesPath+MyAppName+'.exe')                                           ; Версия программы
 
 ; -------------------------------------------------------------------------------------------------------------------------------------------------
-; Настройка Net5
+; Настройка Net6
 ; -------------------------------------------------------------------------------------------------------------------------------------------------
 
-#define Net6Setup "windowsdesktop-runtime-6.0.1-win-x64.exe"
-#define Net6Version "Microsoft.WindowsDesktop.App 6.0.1"
+#define Net6Setup "windowsdesktop-runtime-6.0.36-win-x64.exe"
+#define Net6Version "Microsoft.WindowsDesktop.App 6.0.36"
 
 #define UseNetCoreCheck
 #ifdef UseNetCoreCheck
@@ -33,7 +33,7 @@
 
 [Setup]
 ;Подписывание кода
-SignTool=byparam {#SignTool} sign /a /n $q{#SingNameSSL}$q /t http://timestamp.comodoca.com/authenticode /d $q{#MyAppName}$q $f
+;SignTool=byparam {#SignTool} sign /a /n $q{#SingNameSSL}$q /t http://timestamp.comodoca.com/authenticode /d $q{#MyAppName}$q $f
 
 ;Использовать сгенерируемый VS GUI
 AppId           = {{AE85539E-2BFA-44C9-9153-A2A036BB5AA8}}
@@ -86,7 +86,7 @@ Source: "{#FilesPath}*.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#FilesPath}EODHistoricalDataDownloader.exe"; DestDir: "{app}"; Flags: ignoreversion sign   
 
 ; .NET 6
-Source: "{#SetupPath}{#Net6Setup}"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: not IsNetCoreInstalled('6')
+Source: "{#SetupPath}{#Net6Setup}"; DestDir: "{app}"; Flags: deleteafterinstall; Check: not IsDotNetInstalled('6')
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -120,106 +120,48 @@ function FindApp(const AppName: String): Boolean;
     end;
 end;
 
-
-
-
-function CompareVersion(V1, V2: string): Integer;
+function IsDotNetInstalled(DotNetName: string): Boolean;
 var
-  P, N1, N2: Integer;
+  Cmd, Args: string;
+  FileName: string;
+  Output: AnsiString;
+  Command: string;
+  ResultCode: Integer;
 begin
-  Result := 0;
-  while (Result = 0) and ((V1 <> '') or (V2 <> '')) do
+  FileName := ExpandConstant('{tmp}\dotnet.txt');
+  Cmd := ExpandConstant('{cmd}');
+  Command := 'dotnet --list-runtimes';
+  Args := '/C ' + Command + ' > "' + FileName + '" 2>&1';
+  if Exec(Cmd, Args, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and
+     (ResultCode = 0) then
   begin
-    P := Pos('.', V1);
-    if P > 0 then
+    if LoadStringFromFile(FileName, Output) then
     begin
-      N1 := StrToInt(Copy(V1, 1, P - 1));
-      Delete(V1, 1, P);
-    end
-      else
-    if V1 <> '' then
-    begin
-      N1 := StrToInt(V1);
-      V1 := '';
-    end
-      else
-    begin
-      N1 := 0;
-    end;
-    P := Pos('.', V2);
-    if P > 0 then
-    begin
-      N2 := StrToInt(Copy(V2, 1, P - 1));
-      Delete(V2, 1, P);
-    end
-      else
-    if V2 <> '' then
-    begin
-      N2 := StrToInt(V2);
-      V2 := '';
-    end
-      else
-    begin
-      N2 := 0;
-    end;
-    if N1 < N2 then Result := -1
-      else
-    if N1 > N2 then Result := 1;
-  end;
-end;
-
-
-
-function IsNetCoreInstalled(version: string) : boolean;
-var
-    runtimes: TArrayOfString;
-    I: Integer;
-    versionCompare: Integer;
-    registryKey: string;
-begin
-    registryKey := 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.NETCore.App';
-    if(not IsWin64) then
-       registryKey :=  'SOFTWARE\dotnet\Setup\InstalledVersions\x86\sharedfx\Microsoft.NETCore.App';
-       
-    Log('[.NET] Look for version ' + version);
-       
-    if not RegGetValueNames(HKLM, registryKey, runtimes) then
-    begin
-      Log('[.NET] Issue getting runtimes from registry');
-      Result := False;
-      Exit;
-    end;
-    
-    for I := 0 to GetArrayLength(runtimes)-1 do
-    begin
-      versionCompare := CompareVersion(runtimes[I], version);
-      Log(Format('[.NET] Compare: %s/%s = %d', [runtimes[I], version, versionCompare]));
-      if(not (versionCompare = -1)) then
+      if Pos(DotNetName, Output) > 0 then
       begin
-        Log(Format('[.NET] Selecting %s', [runtimes[I]]));
+        Log('"' + DotNetName + '" found in output of "' + Command + '"');
         Result := True;
-          Exit;
+      end
+        else
+      begin
+        Log('"' + DotNetName + '" not found in output of "' + Command + '"');
+        Result := False;
       end;
+    end
+      else
+    begin
+      Log('Failed to read output of "' + Command + '"');
     end;
-    Log('[.NET] No compatible found');
-    Result := False;
-end;
-
-
-// Callback-функция, вызываемая при инициализации удаления приложения
-function  InitializeUninstall(): Boolean;
+  end
+    else
   begin
-    Result := True;
-    //if (FindApp('excel.exe')) then
-    //begin
-    //  MsgBox('Пожалуйста, закройте все файлы Excel перед удалением программы!', mbError, MB_OK);
-    //   Result := False;
-    //end;
-    
+    Log('Failed to execute "' + Command + '"');
+    Result := False;
+  end;
+  DeleteFile(FileName);
 end;
-
 
 
 [Run]
-Filename: {tmp}\{#Net6Setup}; Parameters: "/install /quiet /norestart"; Check: not IsNetCoreInstalled('6'); StatusMsg: Microsoft Framework {#Net6Version} installing. Please wait...
+Filename: "{app}\{#Net6Setup}"; Parameters: "/install /quiet /norestart"; Check: not IsDotNetInstalled('Microsoft.NETCore.App 6.0.36'); StatusMsg: {#Net6Version} installing. Please wait...
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

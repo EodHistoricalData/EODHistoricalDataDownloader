@@ -57,9 +57,9 @@ namespace EODHistoricalDataDownloader.Program
             {
                 if (GetVersionNews()?.Count > 0) return true;
             }
-            catch (System.Net.WebException ex)
+            catch (System.Net.WebException)
             {
-                throw ex;
+                throw;
             }
 
             return false;

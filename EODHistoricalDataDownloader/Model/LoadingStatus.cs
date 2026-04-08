@@ -1,9 +1,16 @@
-﻿namespace EODHistoricalDataDownloader.Model
+﻿using EODHistoricalDataDownloader.Utils;
+using System.Windows.Forms;
+using System;
+using System.Windows.Input;
+
+namespace EODHistoricalDataDownloader.Model
 {
     internal class LoadingStatus : BaseModal
     {
 
         public string Ticker { get; set; } = "";
+
+        public event Action<LoadingStatus>? Deleted;
 
         public string Status
         {
@@ -43,5 +50,10 @@
         {
             Ticker = ticker;
         }
+
+        public ICommand Delete => new DelegateCommand((obj) =>
+        {
+            Deleted?.Invoke(this);
+        }, (obj) => true);
     }
 }

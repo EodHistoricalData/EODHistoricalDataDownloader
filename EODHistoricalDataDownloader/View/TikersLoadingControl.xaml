@@ -10,42 +10,44 @@
         <vm:TikersLoadingControlVM />
     </UserControl.DataContext>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
+    <Border BorderThickness="0,0,1,0" BorderBrush="{DynamicResource GraphiteMainSolid}" Margin="0,0,2,0">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-            <WrapPanel Orientation="Horizontal">
+            <Grid Grid.Row="0">
 
-                <Button
+                <WrapPanel Orientation="Horizontal">
+
+                    <Button
                     Width="120"
                     Margin="4"
-                   Style="{DynamicResource ButtonPage}"                
+                    Style="{DynamicResource ButtonPage}"                
                     Command="{Binding OpenSearchWindow}"
                     Visibility="Visible"
                     Cursor="Hand">
-                    <StackPanel Orientation="Horizontal">
-                        <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource cloud_addStyle0}"  />
-                        <TextBlock Text="Search tickers" VerticalAlignment="Center" />
-                    </StackPanel>
-                </Button>
+                        <StackPanel Orientation="Horizontal">
+                            <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource cloud_addStyle0}"  />
+                            <TextBlock Text="Search tickers" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
 
-                <Button 
+                    <Button 
                     Style="{DynamicResource ButtonPage}"                    
                     Width="140"
                     Margin="4"
                     Command="{Binding AddFromTextFile}"
                 Cursor="Hand">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                        <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource page_addStyle0}" />
-                        <TextBlock Text="Import from file txt" VerticalAlignment="Center" TextAlignment="Center"/>
-                    </StackPanel>
-                </Button>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource page_addStyle0}" />
+                            <TextBlock Text="Import from file txt" VerticalAlignment="Center" TextAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
 
-                <!--<Button 
+                    <!--<Button 
                     Width="120"
                     Margin="4"
                     Command="{Binding SaveToTextFile}"
@@ -57,38 +59,64 @@
                     </StackPanel>
                 </Button>-->
 
-                <Button 
+                    <Button 
                     Width="100"
                     Margin="4"
                     Command="{Binding ClearList}"
                     Style="{DynamicResource ButtonPage}"                
                 Cursor="Hand">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                        <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource clearStyle0}" />
-                        <TextBlock Text="Clear list" VerticalAlignment="Center" TextAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-            </WrapPanel>
-        </Grid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource clearStyle0}" />
+                            <TextBlock Text="Clear list" VerticalAlignment="Center" TextAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </WrapPanel>
+            </Grid>
+            
+            <DataGrid Grid.Row="1"
+                      ItemsSource="{Binding Tickers}"
+                      SelectedItem="{Binding Ticker}"
+                      CanUserAddRows="False" BorderBrush="{x:Null}" Background="{x:Null}">
 
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Tickers}">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Status"
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Status"
                                         Width="80"
                                         IsReadOnly="True">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel VerticalAlignment="Center"
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center"
                                         Orientation="Horizontal"
                                         Margin="1">
-                                <TextBlock Text="{Binding Path=Status}"></TextBlock>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Width="120"  Binding="{Binding Path=Ticker}" Header="Name"></DataGridTextColumn>
-                <DataGridTextColumn Width="*" Binding="{Binding Path=Filename}" MinWidth="100"  Header="File" />
-            </DataGrid.Columns>
-        </DataGrid>
-    </Grid>
+                                    <TextBlock Text="{Binding Path=Status}"></TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Width="120"  Binding="{Binding Path=Ticker}" Header="Name"></DataGridTextColumn>
+                    <DataGridTextColumn Width="*" Binding="{Binding Path=Filename}" MinWidth="100"  Header="File" />
+                    <DataGridTemplateColumn Width="30">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button
+                                Style="{DynamicResource DeleteTicker}"
+                                Command="{Binding Delete}"
+                                Visibility="Visible"
+                                Cursor="Hand">
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock FontSize="9">X</TextBlock>
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource GraphiteMainSolid}"/>
+                    </Style>
+                </DataGrid.RowStyle>
+            </DataGrid>
+        </Grid>
+    </Border>
 </UserControl>

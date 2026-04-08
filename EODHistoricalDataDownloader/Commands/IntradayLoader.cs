@@ -48,104 +48,95 @@ namespace EODHistoricalDataDownloader.Commands
         /// <param name="filePath"></param>
         internal void LoadToCsv(string filePath, CancellationTokenSource? source = null)
         {
-            if (source == null)
+            source ??= new CancellationTokenSource();
+
+            var queue = new Queue<LoadingStatus>(LoadingStatuses);
+            var _api = new API(ApiKey, Proxy, Program.Program.ProgramName);
+            IUtilsService utils = new UtilsService();
+            List<Task> tasks = new();
+            if (!OneFile)
             {
-                source = new CancellationTokenSource();
-            }
-            try
-            {
-                var queue = new Queue<LoadingStatus>(LoadingStatuses);
-                var _api = new API(ApiKey, Proxy, Program.Program.ProgramName);
-                IUtilsService utils = new UtilsService();
-                List<Task> tasks = new();
-                if (!OneFile)
+                while (queue.TryPeek(out LoadingStatus _))
                 {
-                    while (queue.TryPeek(out LoadingStatus _))
-                    {
-                        LoadingStatus status = queue.Dequeue();
+                    LoadingStatus status = queue.Dequeue();
 
-                        var reqSave = Task.Factory.StartNew(async () =>
-                        {
-                            try
-                            {
-                                status.Status = "Processing";
-                                List<IntradayHistoricalStockPrice>? response = _api.GetIntradayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Interval).Result;
-                                string path = $@"{filePath}\{status.Ticker}.csv";
-                                await utils.CreateCVSFile(response, path, IsUpdate);
-                                status.Status = "OK";
-                                status.Filename = path;
-                            }
-                            catch (Exception ex)
-                            {
-                                status.Status = "Error";
-                                status.Filename = ex.Message;
-                            }
-                        }, source.Token);
-                        tasks.Add(reqSave);
-
-                        if (tasks.Count >= MaxThreads)
-                        {
-                            int i = Task.WaitAny(tasks.ToArray());
-                            tasks.Remove(tasks[i]);
-                        }
-                    }
-                }
-                else
-                {
-                    List<IntradayHistoricalStockPriceTicker>? responseTickerList = new();
-
-                    while (queue.TryPeek(out LoadingStatus _))
-                    {
-                        List<IntradayHistoricalStockPrice>? response;
-                        LoadingStatus status = queue.Dequeue();
-
-                        var reqSave = Task.Factory.StartNew(() =>
-                        {
-                            try
-                            {
-                                status.Status = "Processing";
-                                response = _api.GetIntradayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Interval).Result;
-                                foreach (var item in response)
-                                {
-                                    var responseTicker = new IntradayHistoricalStockPriceTicker(status.Ticker, item);
-                                    responseTickerList.Add(responseTicker);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                status.Status = "Error";
-                                status.Filename = ex.Message;
-                            }
-                        }, source.Token);
-                        tasks.Add(reqSave);
-
-                        if (tasks.Count >= MaxThreads)
-                        {
-                            int i = Task.WaitAny(tasks.ToArray());
-                            tasks.Remove(tasks[i]);
-                        }
-                    }
-
-                    Task.WaitAll(tasks.ToArray());
-                    Task.Factory.StartNew(async () =>
+                    var reqSave = Task.Factory.StartNew(async () =>
                     {
                         try
                         {
-                            List<IntradayHistoricalStockPriceTicker>? sortedList = responseTickerList.OrderBy(x => x.Ticker).ToList();
-                            string path = $@"{filePath}\Intraday Tickers.csv";
-                            await utils.CreateCVSFile(sortedList, path, IsUpdate);
-                            LoadingStatuses.FindAll(s => s.Status == "Processing").ForEach(s => s.Status = "Ok");
+                            status.Status = "Processing";
+                            List<IntradayHistoricalStockPrice>? response = _api.GetIntradayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Interval).Result;
+                            string path = $@"{filePath}\{status.Ticker}.csv";
+                            await utils.CreateCVSFile(response, path, IsUpdate);
+                            status.Status = "OK";
+                            status.Filename = path;
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            status.Status = "Error";
+                            status.Filename = ex.Message;
                         }
-                    });
+                    }, source.Token);
+                    tasks.Add(reqSave);
+
+                    if (tasks.Count >= MaxThreads)
+                    {
+                        int i = Task.WaitAny(tasks.ToArray());
+                        tasks.Remove(tasks[i]);
+                    }
                 }
             }
-            catch (Exception)
+            else
             {
+                List<IntradayHistoricalStockPriceTicker>? responseTickerList = new();
 
+                while (queue.TryPeek(out LoadingStatus _))
+                {
+                    List<IntradayHistoricalStockPrice>? response;
+                    LoadingStatus status = queue.Dequeue();
+
+                    var reqSave = Task.Factory.StartNew(() =>
+                    {
+                        try
+                        {
+                            status.Status = "Processing";
+                            response = _api.GetIntradayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Interval).Result;
+                            foreach (var item in response)
+                            {
+                                var responseTicker = new IntradayHistoricalStockPriceTicker(status.Ticker, item);
+                                responseTickerList.Add(responseTicker);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            status.Status = "Error";
+                            status.Filename = ex.Message;
+                        }
+                    }, source.Token);
+                    tasks.Add(reqSave);
+
+                    if (tasks.Count >= MaxThreads)
+                    {
+                        int i = Task.WaitAny(tasks.ToArray());
+                        tasks.Remove(tasks[i]);
+                    }
+                }
+
+                Task.WaitAll(tasks.ToArray());
+                Task.Factory.StartNew(async () =>
+                {
+                    try
+                    {
+                        List<IntradayHistoricalStockPriceTicker>? sortedList = responseTickerList.OrderBy(x => x.Ticker).ToList();
+                        string path = $@"{filePath}\Intraday Tickers.csv";
+                        await utils.CreateCVSFile(sortedList, path, IsUpdate);
+                        LoadingStatuses.FindAll(s => s.Status == "Processing").ForEach(s => s.Status = "Ok");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                });
             }
         }
     }

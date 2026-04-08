@@ -7,6 +7,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -26,6 +27,10 @@ namespace EODHistoricalDataDownloader.ViewModel
         readonly CancellationTokenSource source = new();
 
         public static List<string> ListOfInterval { get; set; } = new() { "1 minute", "5 minutes", "1 hour" };
+        public static List<string> ListOfFormat { get; set; } = new() { "Metastock", "Amibroker" };
+        public static List<string> ListOfOutput { get; set; } = new() { "All in one file", "Separate files" };
+
+        private bool validated = false;
 
         public string Interval
         {
@@ -34,11 +39,38 @@ namespace EODHistoricalDataDownloader.ViewModel
             {
                 _interval = value;
                 OnPropertyChanged(nameof(Interval));
+                ValidateDates();
                 Settings.SettingsFields.IntradayInterval = Interval;
                 Settings.Save();
             }
         }
         private string _interval = Settings.SettingsFields.IntradayInterval;
+
+        public string? Format
+        {
+            get => _format;
+            set
+            {
+                _format = value;
+                OnPropertyChanged(nameof(Format));
+                Settings.SettingsFields.IntradayFormat = Format;
+                Settings.Save();
+            }
+        }
+        private string? _format = string.IsNullOrEmpty(Settings.SettingsFields.IntradayFormat) ? "Metastock" : Settings.SettingsFields.IntradayFormat;
+
+        public string? Output
+        {
+            get => _output;
+            set
+            {
+                _output = value;
+                OnPropertyChanged(nameof(Output));
+                Settings.SettingsFields.IntradayOutput = Output;
+                Settings.Save();
+            }
+        }
+        private string? _output = Settings.SettingsFields.IntradayOutput;
 
         public DateTime DateFrom
         {
@@ -47,6 +79,7 @@ namespace EODHistoricalDataDownloader.ViewModel
             {
                 _dateFrom = value;
                 OnPropertyChanged(nameof(DateFrom));
+                ValidateDates();
                 Settings.SettingsFields.IntradayFrom = DateFrom;
                 Settings.Save();
             }
@@ -60,6 +93,7 @@ namespace EODHistoricalDataDownloader.ViewModel
             {
                 _dateTo = value;
                 OnPropertyChanged(nameof(DateTo));
+                ValidateDates();
                 Settings.SettingsFields.IntradayTo = DateTo;
                 Settings.Save();
             }
@@ -94,21 +128,6 @@ namespace EODHistoricalDataDownloader.ViewModel
             }
         }
         private bool _isUpdate = Settings.SettingsFields.IntradayIsUpdate;
-
-        public bool OneFile { get; set; }
-
-        public bool AllAvailable
-        {
-            get => _allAvailable;
-            set
-            {
-                _allAvailable = value;
-                OnPropertyChanged(nameof(AllAvailable));
-                Settings.SettingsFields.IntradayAllAvailable = AllAvailable;
-                Settings.Save();
-            }
-        }
-        private bool _allAvailable = Settings.SettingsFields.IntradayAllAvailable;
 
         public WebProxy Proxy
         {
@@ -210,7 +229,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                         }
                     var proxy = Proxy;
                     bool isUpdate = IsUpdate;
-                    bool oneFile = OneFile;
+                    bool oneFile = Output == "All in one file";
                     var loader = new IntradayLoader(apiKey, loadingStatuses, interval, dateFrom, dateTo, maxThreads, proxy, isUpdate, oneFile);
                     Task.Run(() => loader.LoadToCsv(filePath, source), source.Token);
                 },
@@ -260,6 +279,48 @@ namespace EODHistoricalDataDownloader.ViewModel
                 return false;
             }
             return true;
+        }
+
+        private void ValidateDates()
+        {
+            if (validated)
+            {
+                validated = false;
+                return;
+            }
+            validated = true;
+            int maxDays;
+            TimeSpan delta;
+            switch (Interval)
+            {
+                case "1 minute":
+                    maxDays = 120;
+                    delta = (TimeSpan)(DateTo - DateFrom);
+                    if (delta.TotalDays >= maxDays)
+                    {
+                        TimeSpan interval = new TimeSpan(119, 23, 59, 59, 0);
+                        DateFrom = DateTo - interval;
+                    }
+                    break;
+                case "5 minutes":
+                    maxDays = 600;
+                    delta = (TimeSpan)(DateTo - DateFrom);
+                    if (delta.TotalDays >= maxDays)
+                    {
+                        TimeSpan interval = new TimeSpan(599, 23, 59, 59, 0);
+                        DateFrom = DateTo - interval;
+                    }
+                    break;
+                case "1 hour":
+                    maxDays = 7200;
+                    delta = (TimeSpan)(DateTo - DateFrom);
+                    if (delta.TotalDays >= maxDays)
+                    {
+                        TimeSpan interval = new TimeSpan(7199, 23, 59, 59, 0);
+                        DateFrom = DateTo - interval;
+                    }
+                    break;
+            }
         }
     }
 }

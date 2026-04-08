@@ -30,10 +30,6 @@
             <ComboBox Name="cbxInterval" ItemsSource="{Binding ListOfInterval}" SelectedItem="{Binding Interval}">
             </ComboBox>
             <StackPanel Orientation="Horizontal">
-                <CheckBox  Name="cbxAllAvailable"
-                           Margin="0,4,0,0"
-                           Content="All available"
-                           IsChecked="{Binding AllAvailable}" Click="CbxAllAvailable_Click"/>
                 <CheckBox  Margin="0,4,0,0"
                            Content="Update"
                            IsChecked="{Binding IsUpdate}"></CheckBox>
@@ -55,7 +51,7 @@
 
                 <TextBox Width="170" Name="tbxPath" Text="{Binding FilePath}"></TextBox>
                 <Button   Margin="4"           
-                          Style="{DynamicResource MenuButton}" 
+                          Style="{DynamicResource LoadButton}" 
                           Cursor="Hand"
                           Command="{Binding SelectFilePath}">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
@@ -64,28 +60,33 @@
                     </StackPanel>
                 </Button>
             </WrapPanel>
-            <StackPanel>
-                <CheckBox IsChecked="{Binding OneFile}" Margin="4" Content="All tickers in one file"/>
+            <StackPanel Margin="0,4,0,0">
+                <Label>CSV format:</Label>
+                <ComboBox ItemsSource="{Binding ListOfFormat}" SelectedItem="{Binding Format}"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
-                <Button HorizontalAlignment="Right" Margin="4"
-                    Style="{DynamicResource MenuButton}"
-                    Command="{Binding LoadToCsvFiles}"
-                    Visibility="Visible"
-                    Cursor="Hand">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <TextBlock Text="Load to csv" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,6,6,6"/>
-                        <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource page_searchStyle0}"  />
+
+            <StackPanel Margin="0,4,0,0">
+                <Label>Tickers merging:</Label>
+                <ComboBox ItemsSource="{Binding ListOfOutput}" SelectedItem="{Binding Output}"/>
+            </StackPanel>
+            <StackPanel Margin="0,4,0,0">
+                <Button HorizontalAlignment="Stretch" Margin="4"
+                        Style="{DynamicResource LoadButton}"
+                        Command="{Binding LoadToCsvFiles}"
+                        Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource downloadStyle0}"  />
+                        <TextBlock Text="Download data (csv)" VerticalAlignment="Center" Margin="0,6,6,6"/>
                     </StackPanel>
                 </Button>
 
-                <Button HorizontalAlignment="Right" Margin="4"
-                    Style="{DynamicResource MenuButton}"
-                    Command="{Binding CancelSavingFiles}"
-                    Visibility="Visible"
-                    Cursor="Hand">
+                <Button HorizontalAlignment="Center" Margin="4,4,4,4"
+                        Style="{DynamicResource StopButton}"
+                        Command="{Binding CancelSavingFiles}"
+                        Visibility="Visible"
+                        Cursor="Hand">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <TextBlock Text="Cancel" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,6,6,6"/>
+                        <TextBlock Text="Stop" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,6,6,6"/>
                         <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource stopStyle0}"/>
                     </StackPanel>
                 </Button>

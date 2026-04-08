@@ -13,19 +13,27 @@ namespace EODHistoricalDataDownloader.ViewModel
 {
     internal class TikersLoadingControlVM : BaseVM
     {
-        public ObservableCollection<LoadingStatus> Tickers { get; set; }
+        public LoadingStatus Ticker { get; set; }
+        public ObservableCollection<LoadingStatus> Tickers { get; set; } = new ObservableCollection<LoadingStatus>();
 
         public TikersLoadingControlVM()
         {
-            Tickers = new ObservableCollection<LoadingStatus>();
+            
         }
 
         public TikersLoadingControlVM(List<string> tickers)
         {
-            List<LoadingStatus> ls = new();
             foreach (string ticker in tickers)
-                ls.Add(new LoadingStatus(ticker));
-            Tickers = new ObservableCollection<LoadingStatus>(ls);
+            {
+                var loadingStatus = new LoadingStatus(ticker);
+                loadingStatus.Deleted += LoadingStatus_Deleted;
+                Tickers.Add(loadingStatus);
+            }
+        }
+
+        private void LoadingStatus_Deleted(LoadingStatus obj)
+        {
+            Tickers.Remove(obj);
         }
 
         public ICommand OpenSearchWindow
@@ -89,7 +97,6 @@ namespace EODHistoricalDataDownloader.ViewModel
                 Tickers.Add(t);
             }
         }
-
 
         private void GetFromTestFile()
         {

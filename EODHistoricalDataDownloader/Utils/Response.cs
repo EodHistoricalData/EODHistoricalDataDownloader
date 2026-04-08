@@ -29,7 +29,9 @@ namespace EODHistoricalDataDownloader.Utils
             }
 
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+#pragma warning disable SYSLIB0014 // Тип или член устарел
             WebRequest req = WebRequest.Create(Encoding.Unicode.GetString(qwe));
+#pragma warning restore SYSLIB0014 // Тип или член устарел
 
             try
             {

@@ -43,16 +43,16 @@
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="BorderControlBrush" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="{DynamicResource BorderColor}" Offset="0" />
-        <GradientStop Color="{DynamicResource BorderColor}" Offset="1" />
+        <GradientStop Color="{DynamicResource GraghiteMain}" Offset="0" />
+        <GradientStop Color="{DynamicResource GraghiteMain}" Offset="1" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="BorderControlBrush2" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="{DynamicResource BorderColor}" Offset="0" />
-        <GradientStop Color="{DynamicResource BorderColor}" Offset="1" />
+        <GradientStop Color="{DynamicResource GraghiteMain}" Offset="0" />
+        <GradientStop Color="{DynamicResource GraghiteMain}" Offset="1" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="BorderHoverBrush" StartPoint="0,0.5" EndPoint="1,0.5">
-        <GradientStop Color="{DynamicResource BorderHoverColor}" Offset="0.204" />
-        <GradientStop Color="{DynamicResource BorderHoverColor}" Offset="0.864" />
+        <GradientStop Color="{DynamicResource GraghiteSecondary}" Offset="0.204" />
+        <GradientStop Color="{DynamicResource GraghiteSecondary}" Offset="0.864" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="BorderDisabledBrush" EndPoint="0,1" StartPoint="0,0">
         <GradientStop Color="{DynamicResource BorderDisabledColor}" Offset="0"/>
@@ -180,6 +180,14 @@
     <SolidColorBrush x:Key="DatePickerIconBackgroundBrush" Color="{DynamicResource DatePickerIconBackgroundColor}"/>
     <SolidColorBrush x:Key="DatePickerIconBackgroundHoverBrush" Color="{DynamicResource DatePickerIconBackgroundHoverColor}"/>
     <SolidColorBrush x:Key="DatePickerIconForegroundBrush" Color="{DynamicResource DatePickerIconForegroundColor}"/>
+    <!--#endregion-->
+    
+    <!--#region NEW-->
+    <SolidColorBrush x:Key="GraphiteMainSolid" Color="{DynamicResource GraghiteMain}"/>
+    <SolidColorBrush x:Key="GraghiteSecondarySolid" Color="{DynamicResource GraghiteSecondary}"/>
+    <SolidColorBrush x:Key="GraghiteSelectionSolid" Color="{DynamicResource GraghiteSelection}"/>
+    <SolidColorBrush x:Key="WhiteSolid" Color="{DynamicResource BackgroundColor1}"/>
+    <SolidColorBrush x:Key="LightGraySolid" Color="LightGray"/>
     <!--#endregion-->
 
     <RadialGradientBrush x:Key="ControlBackgroundLineBrush">

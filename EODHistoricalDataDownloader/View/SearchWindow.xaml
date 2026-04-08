@@ -20,16 +20,14 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" Width="auto">
-            <Button  Margin="5,0,0,0"
-                         Style="{DynamicResource MenuButton}">
-
+            <Button  Margin="5,0,0,0" Style="{DynamicResource LoadButton}" Focusable="False">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource page_searchStyle0}" />
                 </StackPanel>
             </Button>
             <TextBox  Width="350" Height="30" Text="{Binding SearchString, UpdateSourceTrigger=PropertyChanged}" ></TextBox>
         </StackPanel>
-        
+
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <DataGrid MinWidth="300"
                       Height="Auto"
@@ -39,26 +37,31 @@
                       SelectionMode="Extended"
                       Cursor="Hand" >
                 <DataGrid.Columns>
-                    <DataGridCheckBoxColumn Width="25" Binding="{Binding Path=Selected}" CanUserResize="False"></DataGridCheckBoxColumn>
-                    <DataGridTextColumn Width="*" MinWidth="100" Binding="{Binding Path=Name}"  Header="Name"  CanUserResize="True" SortDirection="Ascending" />
-                    <DataGridTextColumn Width="80" Binding="{Binding Path=Code}" Header="Code" MaxWidth="100" />
-                    <DataGridTextColumn Width="80" Binding="{Binding Path=Exchange}"  Header="Exchange" MaxWidth="100" />
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Width="*" MinWidth="100" Binding="{Binding Path=Name}" Header="Name" CanUserResize="True" SortDirection="Ascending" IsReadOnly="True" />
+                    <DataGridTextColumn Width="80" Binding="{Binding Path=Code}" Header="Code" MaxWidth="100" IsReadOnly="True" />
+                    <DataGridTextColumn Width="80" Binding="{Binding Path=Exchange}"  Header="Exchange" MaxWidth="100" IsReadOnly="True" />
                 </DataGrid.Columns>
             </DataGrid>
         </ScrollViewer>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" >
-            <Button  Width="100" 
-                     Margin="4"
-                     Style="{StaticResource MenuButton}" 
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,2,0">
+            <Button  Width="130"
+                     Style="{StaticResource LoadButton}" 
                      Command="{Binding AddTickers}">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource addStyle0}" />
                     <TextBlock Text="Add tickers"
                                VerticalAlignment="Center" 
-                               TextAlignment="Center"/>                               
+                               TextAlignment="Center"/>
                 </StackPanel>
-            </Button>          
+            </Button>
 
         </StackPanel>
     </Grid>

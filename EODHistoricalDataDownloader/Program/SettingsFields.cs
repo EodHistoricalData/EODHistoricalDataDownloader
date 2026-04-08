@@ -9,7 +9,7 @@ namespace EODHistoricalDataDownloader.Program
         /// <summary>
         /// API ключ
         /// </summary>
-        public string APIKey = "OeAFFmMliFG5orCUuwAKQ8l4WWFQ67YX";
+        public string APIKey = "demo";
         public int MaxThreads = 3;
         public bool UseProxy;
         public string ProxyHost;
@@ -19,19 +19,21 @@ namespace EODHistoricalDataDownloader.Program
 
         public List<string>? EndOfDayTickers;
         public string EndOfDayPeriod;
+        public string EndOfDayFormat = "Metastock";
+        public string EndOfDayOutput;
         public DateTime EndOfDayFrom = DateTime.Today;
         public DateTime EndOfDayTo = DateTime.Today;
         public string EndOfDayFilePath;
         public bool EndOfDayIsUpdate;
-        public bool EndOfDayAllAvailable;
 
         public List<string>? IntradayTickers;
         public string IntradayInterval;
+        public string IntradayFormat = "Metastock";
+        public string IntradayOutput;
         public DateTime IntradayFrom = DateTime.Today;
         public DateTime IntradayTo = DateTime.Today;
         public string IntradayFilePath;
         public bool IntradayIsUpdate;
-        public bool IntradayAllAvailable;
 
         public SettingsFields()
         {
