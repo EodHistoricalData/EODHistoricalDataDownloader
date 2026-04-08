@@ -53,7 +53,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 Settings.Save();
             }
         }
-        private string? _format = Settings.SettingsFields.EndOfDayFormat;
+        private string? _format = string.IsNullOrEmpty(Settings.SettingsFields.EndOfDayFormat) ? "Metastock" : Settings.SettingsFields.EndOfDayFormat;
 
         public string? Output
         {

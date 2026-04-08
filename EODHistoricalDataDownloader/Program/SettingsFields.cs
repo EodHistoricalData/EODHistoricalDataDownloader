@@ -19,7 +19,7 @@ namespace EODHistoricalDataDownloader.Program
 
         public List<string>? EndOfDayTickers;
         public string EndOfDayPeriod;
-        public string EndOfDayFormat;
+        public string EndOfDayFormat = "Metastock";
         public string EndOfDayOutput;
         public DateTime EndOfDayFrom = DateTime.Today;
         public DateTime EndOfDayTo = DateTime.Today;
@@ -28,7 +28,7 @@ namespace EODHistoricalDataDownloader.Program
 
         public List<string>? IntradayTickers;
         public string IntradayInterval;
-        public string IntradayFormat;
+        public string IntradayFormat = "Metastock";
         public string IntradayOutput;
         public DateTime IntradayFrom = DateTime.Today;
         public DateTime IntradayTo = DateTime.Today;

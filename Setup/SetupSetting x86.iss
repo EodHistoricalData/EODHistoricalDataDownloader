@@ -86,7 +86,7 @@ Source: "{#FilesPath}*.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#FilesPath}EODHistoricalDataDownloader.exe"; DestDir: "{app}"; Flags: ignoreversion sign   
 
 ; .NET 6
-Source: "{#SetupPath}{#Net6Setup}"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: not IsDotNetInstalled('6')
+Source: "{#SetupPath}{#Net6Setup}"; DestDir: "{app}"; Flags: deleteafterinstall; Check: not IsDotNetInstalled('6')
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -163,5 +163,5 @@ end;
 
 
 [Run]
-Filename: {tmp}\{#Net6Setup}; Parameters: "/install /quiet /norestart"; Check: not IsDotNetInstalled('Microsoft.NETCore.App 6.0.36'); StatusMsg: Microsoft Framework {#Net6Version} installing. Please wait...
+Filename: "{app}\{#Net6Setup}"; Parameters: "/install /quiet /norestart"; Check: not IsDotNetInstalled('Microsoft.NETCore.App 6.0.36'); StatusMsg: {#Net6Version} installing. Please wait...
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

@@ -24,15 +24,36 @@ namespace EODHistoricalDataDownloader.ViewModel
             set
             {
                 _maxThreads = value;
-
-                int processorCount = Environment.ProcessorCount;
-                if (_maxThreads > 2 * processorCount) _maxThreads = 2 * processorCount;
-                if (_maxThreads < 1) _maxThreads = 1;
-
                 OnPropertyChanged(nameof(MaxThreads));
             }
         }
-        private int _maxThreads = Settings.SettingsFields.MaxThreads;
+        private int _maxThreads = Settings.SettingsFields.MaxThreads > 1 ? 2 : 1;
+
+        public bool OneThread
+        {
+            get => _oneThread;
+            set
+            {
+                _oneThread = value;
+                if (value)
+                    MaxThreads = 1;
+                OnPropertyChanged(nameof(OneThread));
+            }
+        }
+        private bool _oneThread = Settings.SettingsFields.MaxThreads == 1;
+
+        public bool TwoThread
+        {
+            get => _twoThread;
+            set
+            {
+                _twoThread = value;
+                if (value)
+                    MaxThreads = 2;
+                OnPropertyChanged(nameof(TwoThread));
+            }
+        }
+        private bool _twoThread = Settings.SettingsFields.MaxThreads > 1;
 
         public int MaxThreadsRecommended
         {
@@ -91,7 +112,7 @@ namespace EODHistoricalDataDownloader.ViewModel
             {
                 _proxyPassword = value;
                 OnPropertyChanged(nameof(ProxyPassword));
-                
+
             }
         }
         private string _proxyPassword = Settings.SettingsFields.ProxyPassword;

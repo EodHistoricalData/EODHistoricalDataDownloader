@@ -36,13 +36,8 @@
         <Label Grid.Column="0" Content="Simultaneously connections: " HorizontalContentAlignment="Right" Grid.Row="2"/>
         <StackPanel Grid.Column="1" Grid.Row="2" >
 
-            <TextBox Margin="5,5,0,0" HorizontalAlignment="Left" Width="70" Text="{Binding MaxThreads}"
-                 TextAlignment="Center" PreviewTextInput="MaxThreads_PreviewTextInput" PreviewKeyDown="MaxThreads_PreviewKeyDown"/>
-            <TextBlock Background="Transparent" Margin="5">
-				<Run Text="More than"/>
-				<Run Text="{Binding MaxThreadsRecommended, Mode=OneWay}"/>
-				<Run Text="connections are not recommended"/>
-            </TextBlock>
+            <RadioButton GroupName="threads" Content="1" IsChecked="{Binding OneThread}" Margin="5 5 0 0" />
+            <RadioButton GroupName="threads" Content="2" IsChecked="{Binding TwoThread}" Margin="5 5 0 5"/>
         </StackPanel>
 
         <Label Grid.Column="0" Content="Use proxy: " HorizontalContentAlignment="Right" Grid.Row="3"/>
