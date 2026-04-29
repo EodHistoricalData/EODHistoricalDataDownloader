@@ -1,4 +1,6 @@
-﻿using System;
+﻿using EODHistoricalDataDownloader.Model;
+
+using System;
 using System.Collections.Generic;
 
 namespace EODHistoricalDataDownloader.Program
@@ -17,6 +19,7 @@ namespace EODHistoricalDataDownloader.Program
         public string ProxyUsername = "";
         public string ProxyPassword = "";
 
+        // Legacy flat fields — kept for backward compatibility with old settings.xml
         public List<string>? EndOfDayTickers;
         public string EndOfDayPeriod = "Daily";
         public string EndOfDayFormat = "Metastock";
@@ -25,6 +28,9 @@ namespace EODHistoricalDataDownloader.Program
         public DateTime EndOfDayTo = DateTime.Today;
         public string EndOfDayFilePath = "";
         public bool EndOfDayIsUpdate;
+
+        // Download groups (new)
+        public List<DownloadGroup>? EndOfDayGroups;
 
         public List<string>? IntradayTickers;
         public string IntradayInterval = "5 minutes";
