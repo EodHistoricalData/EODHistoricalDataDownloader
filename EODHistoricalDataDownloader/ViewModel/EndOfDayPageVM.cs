@@ -68,6 +68,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 return;
             }
 
+            group.DeleteRequested -= OnDeleteGroupRequested;
             Groups.Remove(group);
             Settings.SettingsFields.EndOfDayGroups?.Remove(group.GetModel());
 

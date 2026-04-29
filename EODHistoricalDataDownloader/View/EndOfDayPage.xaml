@@ -53,13 +53,8 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0">
                                     <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
-                                    <TextBlock FontSize="10" Opacity="0.6">
-                                        <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}{0} tickers">
-                                                <Binding Path="TickerCount"/>
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
+                                    <TextBlock FontSize="10" Opacity="0.6"
+                                             Text="{Binding TickerCount, StringFormat='{}{0} tickers'}"/>
                                     <TextBlock Text="{Binding GroupStatus}" FontSize="10" Opacity="0.7">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">

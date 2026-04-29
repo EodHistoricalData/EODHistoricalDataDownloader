@@ -25,12 +25,12 @@ namespace EODHistoricalDataDownloader.Commands
         internal DateTime DateFrom { get; set; }
         internal DateTime DateTo { get; set; }
         internal int MaxThreads { get; set; }
-        internal WebProxy Proxy { get; set; }
+        internal WebProxy? Proxy { get; set; }
         internal bool IsUpdate { get; set; }
         internal bool OneFile { get; set; }
 
         internal EndOfDayLoader(string apiKey, List<LoadingStatus> loadingStatuses, HistoricalPeriod period, DateTime dateFrom, DateTime dateTo,
-            int maxThreads, WebProxy proxy, bool isUpdate, bool oneFile)
+            int maxThreads, WebProxy? proxy, bool isUpdate, bool oneFile)
         {
             ApiKey = apiKey;
             LoadingStatuses = loadingStatuses;
@@ -115,9 +115,12 @@ namespace EODHistoricalDataDownloader.Commands
                             ct.ThrowIfCancellationRequested();
                             status.Status = TickerStatus.Processing;
                             List<HistoricalStockPrice>? response = await _api.GetEndOfDayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Period);
-                            foreach (var item in response)
+                            if (response != null)
                             {
-                                responseTickerList.Add(new HistoricalStockPriceTicker(status.Ticker, item));
+                                foreach (var item in response)
+                                {
+                                    responseTickerList.Add(new HistoricalStockPriceTicker(status.Ticker, item));
+                                }
                             }
                             status.Status = TickerStatus.OK;
                         }

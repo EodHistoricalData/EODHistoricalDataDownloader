@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Windows;
 using System.Xml.Serialization;
 
 namespace EODHistoricalDataDownloader.Program
@@ -62,7 +63,13 @@ namespace EODHistoricalDataDownloader.Program
             lock (_saveLock)
             {
                 _debounceTimer?.Dispose();
-                _debounceTimer = new Timer(_ => Save(), null, 500, Timeout.Infinite);
+                _debounceTimer = new Timer(_ =>
+                {
+                    if (Application.Current?.Dispatcher != null)
+                        Application.Current.Dispatcher.Invoke(Save);
+                    else
+                        Save();
+                }, null, 500, Timeout.Infinite);
             }
         }
 
