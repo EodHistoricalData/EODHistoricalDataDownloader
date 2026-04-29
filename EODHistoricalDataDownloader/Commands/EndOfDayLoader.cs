@@ -47,6 +47,7 @@ namespace EODHistoricalDataDownloader.Commands
         {
             var _api = new API(ApiKey, Proxy, Program.Program.ProgramName);
             IUtilsService utils = new UtilsService();
+            ICsvHistoryService csvHistory = new CsvHistoryService();
             using var semaphore = new SemaphoreSlim(MaxThreads);
 
             try
@@ -60,8 +61,26 @@ namespace EODHistoricalDataDownloader.Commands
                         {
                             ct.ThrowIfCancellationRequested();
                             status.Status = TickerStatus.Processing;
-                            List<HistoricalStockPrice>? response = await _api.GetEndOfDayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Period);
+
+                            DateTime tickerDateFrom = DateFrom;
+                            DateTime? lastDate = null;
                             string path = Path.Combine(filePath, $"{status.Ticker}.csv");
+
+                            if (IsUpdate)
+                            {
+                                lastDate = csvHistory.GetLastDate(path);
+                                if (lastDate.HasValue)
+                                    tickerDateFrom = lastDate.Value;
+                            }
+
+                            List<HistoricalStockPrice>? response = await _api.GetEndOfDayHistoricalStockPriceAsync(
+                                status.Ticker, tickerDateFrom, DateTo, Period);
+
+                            if (IsUpdate && lastDate.HasValue && response != null)
+                            {
+                                response = response.Where(r => r.Date > lastDate.Value).ToList();
+                            }
+
                             await utils.CreateCVSFile(response, path, IsUpdate);
                             status.Status = TickerStatus.OK;
                             status.Filename = path;
