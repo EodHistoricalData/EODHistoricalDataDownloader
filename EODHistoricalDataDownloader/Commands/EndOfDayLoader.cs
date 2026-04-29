@@ -1,4 +1,4 @@
-﻿using EOD;
+using EOD;
 using EOD.Model;
 
 using EODHistoricalDataDownloader.Model;
@@ -6,12 +6,13 @@ using EODHistoricalDataDownloader.Model;
 using EODLoader.Services.Utils;
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using static EOD.API;
 
 namespace EODHistoricalDataDownloader.Commands
@@ -41,107 +42,92 @@ namespace EODHistoricalDataDownloader.Commands
             IsUpdate = isUpdate;
             OneFile = oneFile;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filePath"></param>
-        internal void LoadToCsv(string filePath, CancellationTokenSource? source = null)
+
+        internal async Task LoadToCsvAsync(string filePath, CancellationToken ct = default)
         {
-            if (source == null)
-            {
-                source = new CancellationTokenSource();
-            }
+            var _api = new API(ApiKey, Proxy, Program.Program.ProgramName);
+            IUtilsService utils = new UtilsService();
+            using var semaphore = new SemaphoreSlim(MaxThreads);
+
             try
             {
-                var queue = new Queue<LoadingStatus>(LoadingStatuses);
-                var _api = new API(ApiKey, Proxy, Program.Program.ProgramName);
-                IUtilsService utils = new UtilsService();
-                List<Task> tasks = new();
-
                 if (!OneFile)
                 {
-                    while (queue.TryPeek(out LoadingStatus _))
+                    var tasks = LoadingStatuses.Select(status => Task.Run(async () =>
                     {
-                        LoadingStatus status = queue.Dequeue();
-
-                        var reqSave = Task.Factory.StartNew(async () =>
-                        {
-                            try
-                            {
-                                status.Status = TickerStatus.Processing;
-                                List<HistoricalStockPrice>? response = _api.GetEndOfDayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Period).Result;
-                                string path = $@"{filePath}\{status.Ticker}.csv";
-                                await utils.CreateCVSFile(response, path, IsUpdate);
-                                status.Status = TickerStatus.OK;
-                                status.Filename = path;
-                            }
-                            catch (Exception ex)
-                            {
-                                status.Status = TickerStatus.Error;
-                                status.Filename = ex.Message;
-                            }
-                        }, source.Token);
-                        tasks.Add(reqSave);
-
-                        if (tasks.Count >= MaxThreads)
-                        {
-                            int i = Task.WaitAny(tasks.ToArray());
-                            tasks.Remove(tasks[i]);
-                        }
-                    }
-                }
-                else
-                {
-                    List<HistoricalStockPriceTicker>? responseTickerList = new();
-
-                    while (queue.TryPeek(out LoadingStatus _))
-                    {
-                        List<HistoricalStockPrice>? response;
-                        LoadingStatus status = queue.Dequeue();
-
-                        var reqSave = Task.Factory.StartNew(() =>
-                        {
-                            try
-                            {
-                                status.Status = TickerStatus.Processing;
-                                response = _api.GetEndOfDayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Period).Result;
-                                foreach (var item in response)
-                                {
-                                    var responseTicker = new HistoricalStockPriceTicker(status.Ticker, item);
-                                    responseTickerList.Add(responseTicker);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                status.Status = TickerStatus.Error;
-                                status.Filename = ex.Message;
-                            }
-                        }, source.Token);
-                        tasks.Add(reqSave);
-
-                        if (tasks.Count >= MaxThreads)
-                        {
-                            int i = Task.WaitAny(tasks.ToArray());
-                            tasks.Remove(tasks[i]);
-                        }
-                    }
-
-                    Task.WaitAll(tasks.ToArray());
-                    Task.Factory.StartNew(async () =>
-                    {
+                        await semaphore.WaitAsync(ct);
                         try
                         {
-                            List<HistoricalStockPriceTicker>? sortedList = responseTickerList.OrderBy(x => x.Ticker).ToList();
-                            string path = $@"{filePath}\End of Day Tickers.csv";
-                            await utils.CreateCVSFile(sortedList, path, IsUpdate);
-                            LoadingStatuses.FindAll(s => s.Status == TickerStatus.Processing).ForEach(s => s.Status = TickerStatus.OK);
+                            ct.ThrowIfCancellationRequested();
+                            status.Status = TickerStatus.Processing;
+                            List<HistoricalStockPrice>? response = await _api.GetEndOfDayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Period);
+                            string path = Path.Combine(filePath, $"{status.Ticker}.csv");
+                            await utils.CreateCVSFile(response, path, IsUpdate);
+                            status.Status = TickerStatus.OK;
+                            status.Filename = path;
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            status.Status = TickerStatus.Error;
+                            status.Filename = "Cancelled";
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            status.Status = TickerStatus.Error;
+                            status.Filename = ex.Message;
                         }
-                    });
+                        finally
+                        {
+                            semaphore.Release();
+                        }
+                    }, ct)).ToList();
+
+                    await Task.WhenAll(tasks);
                 }
+                else
+                {
+                    var responseTickerList = new ConcurrentBag<HistoricalStockPriceTicker>();
+
+                    var tasks = LoadingStatuses.Select(status => Task.Run(async () =>
+                    {
+                        await semaphore.WaitAsync(ct);
+                        try
+                        {
+                            ct.ThrowIfCancellationRequested();
+                            status.Status = TickerStatus.Processing;
+                            List<HistoricalStockPrice>? response = await _api.GetEndOfDayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Period);
+                            foreach (var item in response)
+                            {
+                                responseTickerList.Add(new HistoricalStockPriceTicker(status.Ticker, item));
+                            }
+                            status.Status = TickerStatus.OK;
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            status.Status = TickerStatus.Error;
+                            status.Filename = "Cancelled";
+                        }
+                        catch (Exception ex)
+                        {
+                            status.Status = TickerStatus.Error;
+                            status.Filename = ex.Message;
+                        }
+                        finally
+                        {
+                            semaphore.Release();
+                        }
+                    }, ct)).ToList();
+
+                    await Task.WhenAll(tasks);
+
+                    var sortedList = responseTickerList.OrderBy(x => x.Ticker).ToList();
+                    string path = Path.Combine(filePath, "End of Day Tickers.csv");
+                    await utils.CreateCVSFile(sortedList, path, IsUpdate);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is expected — no action needed
             }
             catch (Exception ex)
             {

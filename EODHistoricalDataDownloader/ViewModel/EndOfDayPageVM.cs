@@ -23,7 +23,7 @@ namespace EODHistoricalDataDownloader.ViewModel
     {
         public TikersLoadingControlVM TikersLoadingControlVM { get; set; }
 
-        readonly CancellationTokenSource source = new();
+        private CancellationTokenSource _cts = new();
 
         public static List<string> ListOfPeriod { get; set; } = new() { "Daily", "Weekly", "Monthly" };
         public static List<string> ListOfFormat { get; set; } = new() { "Metastock", "Amibroker" };
@@ -202,8 +202,10 @@ namespace EODHistoricalDataDownloader.ViewModel
                     var proxy = ProxyFactory.Create();
                     bool isUpdate = IsUpdate;
                     bool oneFile = Output == "All in one file";
+                    _cts = new CancellationTokenSource();
+                    var token = _cts.Token;
                     var loader = new EndOfDayLoader(apiKey, loadingStatuses, historicalPeriod, dateFrom, dateTo, maxThreads, proxy, isUpdate, oneFile);
-                    Task.Run(() => loader.LoadToCsv(filePath, source), source.Token);
+                    _ = Task.Run(async () => await loader.LoadToCsvAsync(filePath, token), token);
                 },
                 (obj) =>
                 {
@@ -221,7 +223,7 @@ namespace EODHistoricalDataDownloader.ViewModel
             {
                 return new DelegateCommand((obj) =>
                 {
-                    source.Cancel();
+                    _cts.Cancel();
                 },
                 (obj) =>
                 {
