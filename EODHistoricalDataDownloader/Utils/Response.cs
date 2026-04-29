@@ -1,6 +1,5 @@
-﻿using System;
-using System.Net;
-using System.Text;
+using System;
+using System.Net.Http;
 
 namespace EODHistoricalDataDownloader.Utils
 {
@@ -9,8 +8,10 @@ namespace EODHistoricalDataDownloader.Utils
     /// </summary>
     public static class Response
     {
+        private static readonly HttpClient _httpClient = new();
+
         /// <summary>
-        /// 
+        /// Synchronous GET request
         /// </summary>
         /// <param name="Url"></param>
         /// <param name="Data"></param>
@@ -18,49 +19,29 @@ namespace EODHistoricalDataDownloader.Utils
         /// <exception cref="APIException"></exception>
         public static string GET(string Url, string Data = "")
         {
-            byte[] qwe;
-            if (Data == "")
-            {
-                qwe = Encoding.Unicode.GetBytes(Url);
-            }
-            else
-            {
-                qwe = Encoding.Unicode.GetBytes(Url + "?" + Data);
-            }
-
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-#pragma warning disable SYSLIB0014 // Тип или член устарел
-            WebRequest req = WebRequest.Create(Encoding.Unicode.GetString(qwe));
-#pragma warning restore SYSLIB0014 // Тип или член устарел
+            string requestUrl = string.IsNullOrEmpty(Data) ? Url : Url + "?" + Data;
 
             try
             {
-                WebResponse resp = req.GetResponse();
-                System.IO.Stream stream = resp.GetResponseStream();
-                System.IO.StreamReader sr = new System.IO.StreamReader(stream);
-                string Out = sr.ReadToEnd();
-                sr.Close();
-
-                return Out;
+                using var response = _httpClient.GetAsync(requestUrl).GetAwaiter().GetResult();
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new APIException((int)response.StatusCode, response.ReasonPhrase ?? "Unknown error");
+                }
+                return response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             }
-            catch (WebException ex)
+            catch (HttpRequestException ex)
             {
-                if (ex.Status == WebExceptionStatus.ProtocolError)
-                {
-                    HttpWebResponse httpResponse = (HttpWebResponse)ex.Response;
-                    throw new APIException((int)httpResponse.StatusCode, ex.Message);
-                }
-                else
-                {
-                    throw new APIException(500, ex.Message);
-                }
-
+                throw new APIException(500, ex.Message);
+            }
+            catch (APIException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
                 throw new APIException(0, ex.Message);
             }
-
         }
     }
 }

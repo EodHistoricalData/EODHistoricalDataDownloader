@@ -1,11 +1,13 @@
-﻿using EOD;
+using EOD;
 using EOD.Model;
 
+using EODHistoricalDataDownloader.Program;
 using EODHistoricalDataDownloader.Utils;
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -18,17 +20,16 @@ namespace EODHistoricalDataDownloader.ViewModel
 
         public ObservableCollection<Model.SearchResult> SearchResults { get; set; }
 
+        private CancellationTokenSource? _searchCts;
+
         public string SearchString
         {
-            get
-            {
-                return _searchString;
-            }
+            get => _searchString;
             set
             {
                 _searchString = value;
-                GetTickers().ContinueWith(x => { });
-                OnPropertyChanged(nameof(SearchResults));
+                OnPropertyChanged(nameof(SearchString));
+                DebounceSearch();
             }
         }
         string _searchString = "";
@@ -61,11 +62,30 @@ namespace EODHistoricalDataDownloader.ViewModel
             }
         }
 
+        private async void DebounceSearch()
+        {
+            _searchCts?.Cancel();
+            _searchCts = new CancellationTokenSource();
+            var token = _searchCts.Token;
+
+            try
+            {
+                await Task.Delay(300, token);
+                if (token.IsCancellationRequested) return;
+                await GetTickers();
+            }
+            catch (TaskCanceledException)
+            {
+                // Debounce cancelled — expected
+            }
+        }
+
         private async Task GetTickers()
         {
             if (!string.IsNullOrWhiteSpace(SearchString))
             {
-                API _api = new(AppSettings.TestApiKey, null);
+                string apiKey = Settings.SettingsFields?.APIKey ?? "demo";
+                API _api = new(apiKey, null);
                 List<SearchResult> results = await _api.GetSearchResultAsync(SearchString);
                 SearchResults.Clear();
                 foreach (SearchResult result in results)
