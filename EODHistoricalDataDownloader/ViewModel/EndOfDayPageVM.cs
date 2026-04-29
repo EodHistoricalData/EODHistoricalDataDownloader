@@ -189,7 +189,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                     foreach (var loadingStatus in TikersLoadingControlVM.Tickers)
                     {
                         listOfTickers.Add(loadingStatus.Ticker);
-                        loadingStatus.Status = "Waiting";
+                        loadingStatus.Status = TickerStatus.Waiting;
                         loadingStatus.Filename = "";
                     }
                     Settings.SettingsFields.EndOfDayTickers = listOfTickers;

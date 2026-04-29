@@ -68,16 +68,16 @@ namespace EODHistoricalDataDownloader.Commands
                         {
                             try
                             {
-                                status.Status = "Processing";
+                                status.Status = TickerStatus.Processing;
                                 List<HistoricalStockPrice>? response = _api.GetEndOfDayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Period).Result;
                                 string path = $@"{filePath}\{status.Ticker}.csv";
                                 await utils.CreateCVSFile(response, path, IsUpdate);
-                                status.Status = "OK";
+                                status.Status = TickerStatus.OK;
                                 status.Filename = path;
                             }
                             catch (Exception ex)
                             {
-                                status.Status = "Error";
+                                status.Status = TickerStatus.Error;
                                 status.Filename = ex.Message;
                             }
                         }, source.Token);
@@ -103,7 +103,7 @@ namespace EODHistoricalDataDownloader.Commands
                         {
                             try
                             {
-                                status.Status = "Processing";
+                                status.Status = TickerStatus.Processing;
                                 response = _api.GetEndOfDayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Period).Result;
                                 foreach (var item in response)
                                 {
@@ -113,7 +113,7 @@ namespace EODHistoricalDataDownloader.Commands
                             }
                             catch (Exception ex)
                             {
-                                status.Status = "Error";
+                                status.Status = TickerStatus.Error;
                                 status.Filename = ex.Message;
                             }
                         }, source.Token);
@@ -134,7 +134,7 @@ namespace EODHistoricalDataDownloader.Commands
                             List<HistoricalStockPriceTicker>? sortedList = responseTickerList.OrderBy(x => x.Ticker).ToList();
                             string path = $@"{filePath}\End of Day Tickers.csv";
                             await utils.CreateCVSFile(sortedList, path, IsUpdate);
-                            LoadingStatuses.FindAll(s => s.Status == "Processing").ForEach(s => s.Status = "Ok");
+                            LoadingStatuses.FindAll(s => s.Status == TickerStatus.Processing).ForEach(s => s.Status = TickerStatus.OK);
                         }
                         catch (Exception ex)
                         {

@@ -92,7 +92,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 LoadingStatus t = new()
                 {
                     Ticker = ticker,
-                    Status = "New"
+                    Status = TickerStatus.New
                 };
                 Tickers.Add(t);
             }

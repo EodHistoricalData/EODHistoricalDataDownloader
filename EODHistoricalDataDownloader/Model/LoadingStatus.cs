@@ -12,23 +12,16 @@ namespace EODHistoricalDataDownloader.Model
 
         public event Action<LoadingStatus>? Deleted;
 
-        public string Status
+        public TickerStatus Status
         {
-            get
-            {
-                if (string.IsNullOrEmpty(_status))
-                {
-                    _status = "";
-                }
-                return _status;
-            }
+            get => _status;
             set
             {
                 _status = value;
                 OnPropertyChanged(nameof(Status));
             }
         }
-        private string? _status;
+        private TickerStatus _status = TickerStatus.New;
 
         public string? Filename
         {

@@ -64,16 +64,16 @@ namespace EODHistoricalDataDownloader.Commands
                     {
                         try
                         {
-                            status.Status = "Processing";
+                            status.Status = TickerStatus.Processing;
                             List<IntradayHistoricalStockPrice>? response = _api.GetIntradayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Interval).Result;
                             string path = $@"{filePath}\{status.Ticker}.csv";
                             await utils.CreateCVSFile(response, path, IsUpdate);
-                            status.Status = "OK";
+                            status.Status = TickerStatus.OK;
                             status.Filename = path;
                         }
                         catch (Exception ex)
                         {
-                            status.Status = "Error";
+                            status.Status = TickerStatus.Error;
                             status.Filename = ex.Message;
                         }
                     }, source.Token);
@@ -99,7 +99,7 @@ namespace EODHistoricalDataDownloader.Commands
                     {
                         try
                         {
-                            status.Status = "Processing";
+                            status.Status = TickerStatus.Processing;
                             response = _api.GetIntradayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Interval).Result;
                             foreach (var item in response)
                             {
@@ -109,7 +109,7 @@ namespace EODHistoricalDataDownloader.Commands
                         }
                         catch (Exception ex)
                         {
-                            status.Status = "Error";
+                            status.Status = TickerStatus.Error;
                             status.Filename = ex.Message;
                         }
                     }, source.Token);
@@ -130,7 +130,7 @@ namespace EODHistoricalDataDownloader.Commands
                         List<IntradayHistoricalStockPriceTicker>? sortedList = responseTickerList.OrderBy(x => x.Ticker).ToList();
                         string path = $@"{filePath}\Intraday Tickers.csv";
                         await utils.CreateCVSFile(sortedList, path, IsUpdate);
-                        LoadingStatuses.FindAll(s => s.Status == "Processing").ForEach(s => s.Status = "Ok");
+                        LoadingStatuses.FindAll(s => s.Status == TickerStatus.Processing).ForEach(s => s.Status = TickerStatus.OK);
                     }
                     catch (Exception ex)
                     {
