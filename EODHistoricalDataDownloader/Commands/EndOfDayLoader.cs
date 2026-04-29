@@ -143,9 +143,13 @@ namespace EODHistoricalDataDownloader.Commands
                     });
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                System.Diagnostics.Debug.WriteLine($"EndOfDayLoader error: {ex}");
+                LoadingStatuses
+                    .Where(s => s.Status == TickerStatus.Processing)
+                    .ToList()
+                    .ForEach(s => { s.Status = TickerStatus.Error; s.Filename = ex.Message; });
             }
         }
     }

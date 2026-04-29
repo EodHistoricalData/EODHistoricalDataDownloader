@@ -110,12 +110,11 @@ namespace EODHistoricalDataDownloader.ViewModel
                 string filePath = openFileDialog.FileName;
 
                 using StreamReader fstream = new(filePath);
-                while (!fstream?.EndOfStream ?? true)
+                while (!fstream.EndOfStream)
                 {
-                    string text = fstream?.ReadLine() ?? "";
+                    string text = fstream.ReadLine() ?? "";
                     Tickers.Add(new LoadingStatus() { Ticker = text });
                 }
-                fstream?.Close();
             }
         }
     }

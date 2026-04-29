@@ -53,16 +53,8 @@ namespace EODHistoricalDataDownloader.Program
         }
         private static bool CheckUpdate()
         {
-            try
-            {
-                if (GetVersionNews()?.Count > 0) return true;
-            }
-            catch (System.Net.WebException)
-            {
-                throw;
-            }
-
-            return false;
+            try { return GetVersionNews()?.Count > 0; }
+            catch { return false; }
         }
         internal static List<Version> GetVersionNews()
         {
