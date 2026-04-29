@@ -41,7 +41,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 OnPropertyChanged(nameof(Interval));
                 ValidateDates();
                 Settings.SettingsFields.IntradayInterval = Interval;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private string _interval = Settings.SettingsFields.IntradayInterval;
@@ -54,7 +54,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _format = value;
                 OnPropertyChanged(nameof(Format));
                 Settings.SettingsFields.IntradayFormat = Format;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private string? _format = string.IsNullOrEmpty(Settings.SettingsFields.IntradayFormat) ? "Metastock" : Settings.SettingsFields.IntradayFormat;
@@ -67,7 +67,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _output = value;
                 OnPropertyChanged(nameof(Output));
                 Settings.SettingsFields.IntradayOutput = Output;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private string? _output = Settings.SettingsFields.IntradayOutput;
@@ -81,7 +81,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 OnPropertyChanged(nameof(DateFrom));
                 ValidateDates();
                 Settings.SettingsFields.IntradayFrom = DateFrom;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         DateTime _dateFrom = Settings.SettingsFields.IntradayFrom;
@@ -95,7 +95,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 OnPropertyChanged(nameof(DateTo));
                 ValidateDates();
                 Settings.SettingsFields.IntradayTo = DateTo;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         DateTime _dateTo = Settings.SettingsFields.IntradayTo;
@@ -111,7 +111,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _filePath = value;
                 OnPropertyChanged(nameof(FilePath));
                 Settings.SettingsFields.IntradayFilePath = FilePath;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private string _filePath = Settings.SettingsFields.IntradayFilePath;
@@ -124,20 +124,10 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _isUpdate = value;
                 OnPropertyChanged(nameof(IsUpdate));
                 Settings.SettingsFields.IntradayIsUpdate = IsUpdate;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private bool _isUpdate = Settings.SettingsFields.IntradayIsUpdate;
-
-        public WebProxy Proxy
-        {
-            get => _proxy;
-            set
-            {
-                _proxy = value;
-            }
-        }
-        private WebProxy _proxy;
 
         public IntradayPageVM()
         {
@@ -214,20 +204,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                     string filePath = FilePath;
                     int maxThreads = Settings.SettingsFields.MaxThreads;
                     if (maxThreads > Environment.ProcessorCount * 2) maxThreads = Environment.ProcessorCount * 2;
-                    if (Settings.SettingsFields.UseProxy)
-                        try
-                        {
-                            Proxy = new(Settings.SettingsFields.ProxyHost);
-                            if (Settings.SettingsFields.WithCredentials)
-                            {
-                                Proxy.Credentials = new NetworkCredential(Settings.SettingsFields.ProxyUsername, Settings.SettingsFields.ProxyPassword);
-                            }
-                        }
-                        catch (Exception)
-                        {
-
-                        }
-                    var proxy = Proxy;
+                    var proxy = ProxyFactory.Create();
                     bool isUpdate = IsUpdate;
                     bool oneFile = Output == "All in one file";
                     var loader = new IntradayLoader(apiKey, loadingStatuses, interval, dateFrom, dateTo, maxThreads, proxy, isUpdate, oneFile);

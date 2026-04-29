@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Xml.Serialization;
 
 namespace EODHistoricalDataDownloader.Program
@@ -9,6 +10,9 @@ namespace EODHistoricalDataDownloader.Program
         private static readonly string xmlFilename = "settings.xml";
         private static readonly string path;
         internal static SettingsFields? SettingsFields;
+
+        private static Timer? _debounceTimer;
+        private static readonly object _saveLock = new();
 
         static Settings()
         {
@@ -45,6 +49,15 @@ namespace EODHistoricalDataDownloader.Program
             XmlSerializer formatter = new(typeof(SettingsFields));
             using FileStream fs = new(path, FileMode.Create);
             formatter.Serialize(fs, SettingsFields);
+        }
+
+        internal static void SaveDebounced()
+        {
+            lock (_saveLock)
+            {
+                _debounceTimer?.Dispose();
+                _debounceTimer = new Timer(_ => Save(), null, 500, Timeout.Infinite);
+            }
         }
     }
 }

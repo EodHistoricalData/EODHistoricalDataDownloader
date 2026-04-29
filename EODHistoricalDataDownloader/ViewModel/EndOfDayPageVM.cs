@@ -37,7 +37,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _period = value;
                 OnPropertyChanged(nameof(Period));
                 Settings.SettingsFields.EndOfDayPeriod = Period;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private string? _period = Settings.SettingsFields.EndOfDayPeriod;
@@ -50,7 +50,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _format = value;
                 OnPropertyChanged(nameof(Format));
                 Settings.SettingsFields.EndOfDayFormat = Format;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private string? _format = string.IsNullOrEmpty(Settings.SettingsFields.EndOfDayFormat) ? "Metastock" : Settings.SettingsFields.EndOfDayFormat;
@@ -63,7 +63,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _output = value;
                 OnPropertyChanged(nameof(Output));
                 Settings.SettingsFields.EndOfDayOutput = Output;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private string? _output = Settings.SettingsFields.EndOfDayOutput;
@@ -76,7 +76,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _dateFrom = value;
                 OnPropertyChanged(nameof(DateFrom));
                 Settings.SettingsFields.EndOfDayFrom = DateFrom;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private DateTime _dateFrom = Settings.SettingsFields.EndOfDayFrom;
@@ -89,7 +89,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _dateTo = value;
                 OnPropertyChanged(nameof(DateTo));
                 Settings.SettingsFields.EndOfDayTo = DateTo;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private DateTime _dateTo = Settings.SettingsFields.EndOfDayTo;
@@ -105,7 +105,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _filePath = value;
                 OnPropertyChanged(nameof(FilePath));
                 Settings.SettingsFields.EndOfDayFilePath = FilePath;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private string _filePath = Settings.SettingsFields.EndOfDayFilePath;
@@ -118,20 +118,10 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _isUpdate = value;
                 OnPropertyChanged(nameof(IsUpdate));
                 Settings.SettingsFields.EndOfDayIsUpdate = IsUpdate;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private bool _isUpdate = Settings.SettingsFields.EndOfDayIsUpdate;
-
-        public WebProxy Proxy
-        {
-            get => _proxy;
-            set
-            {
-                _proxy = value;
-            }
-        }
-        private WebProxy _proxy;
 
         public EndOfDayPageVM()
         {
@@ -209,20 +199,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                     string filePath = FilePath;
                     int maxThreads = Settings.SettingsFields.MaxThreads;
                     if (maxThreads > Environment.ProcessorCount * 2) maxThreads = Environment.ProcessorCount * 2;
-                    if (Settings.SettingsFields.UseProxy)
-                        try
-                        {
-                            Proxy = new(Settings.SettingsFields.ProxyHost);
-                            if (Settings.SettingsFields.WithCredentials)
-                            {
-                                Proxy.Credentials = new NetworkCredential(Settings.SettingsFields.ProxyUsername, Settings.SettingsFields.ProxyPassword);
-                            }
-                        }
-                        catch (Exception)
-                        {
-
-                        }
-                    var proxy = Proxy;
+                    var proxy = ProxyFactory.Create();
                     bool isUpdate = IsUpdate;
                     bool oneFile = Output == "All in one file";
                     var loader = new EndOfDayLoader(apiKey, loadingStatuses, historicalPeriod, dateFrom, dateTo, maxThreads, proxy, isUpdate, oneFile);
