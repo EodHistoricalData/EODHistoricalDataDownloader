@@ -25,19 +25,28 @@ namespace EODLoader.Services.Utils
                 using StreamWriter writer = new(File.Open(path, FileMode.Append));
                 foreach (var item in items)
                 {
-                    writer.WriteLine(string.Join(",", props.Select(p => p.GetValue(item, null))));
+                    writer.WriteLine(string.Join(",", props.Select(p => EscapeCsvField(p.GetValue(item, null)))));
                 }
             }
             else
             {
                 using StreamWriter writer = new(path);
-                writer.WriteLine(string.Join(",", props.Select(p => p.Name)));
+                writer.WriteLine(string.Join(",", props.Select(p => EscapeCsvField(p.Name))));
 
                 foreach (var item in items)
                 {
-                    writer.WriteLine(string.Join(",", props.Select(p => p.GetValue(item, null))));
+                    writer.WriteLine(string.Join(",", props.Select(p => EscapeCsvField(p.GetValue(item, null)))));
                 }
             }
+        }
+
+        private static string EscapeCsvField(object? value)
+        {
+            if (value == null) return "";
+            string field = value.ToString() ?? "";
+            if (field.Contains(',') || field.Contains('"') || field.Contains('\n') || field.Contains('\r'))
+                return "\"" + field.Replace("\"", "\"\"") + "\"";
+            return field;
         }
 
         public bool RewriteDateBeforeLoad(string path, ref DateTime? startDate, ref DateTime? endDate)
