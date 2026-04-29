@@ -49,35 +49,5 @@ namespace EODLoader.Services.Utils
             return field;
         }
 
-        public bool RewriteDateBeforeLoad(string path, ref DateTime? startDate, ref DateTime? endDate)
-        {
-            if (CVSFileIsExist(path))
-            {
-                if (new FileInfo(path).Length < 2)
-                {
-                    return false;
-                }
-
-                if (DateTime.TryParse(File.ReadLines(path).Last().Split(',')[0], out DateTime dateParse))
-                {
-                    startDate = dateParse.AddDays(1);
-                }
-                else
-                {
-                    return false;
-                }
-
-                endDate = DateTime.Now;
-
-                return true;
-            }
-            return false;
-        }
-
-        //Существует ли такой CSV
-        private static bool CVSFileIsExist(string path)
-        {
-            return File.Exists(path);
-        }
     }
 }
