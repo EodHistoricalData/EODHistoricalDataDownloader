@@ -119,10 +119,6 @@ namespace EODHistoricalDataDownloader.ViewModel
         public ICommand LoadAllGroups => new DelegateCommand((obj) =>
         {
             var groupsToDownload = Groups.ToList();
-            foreach (var g in groupsToDownload)
-            {
-                if (!ValidateGroup(g)) return;
-            }
 
             _cts = new CancellationTokenSource();
             var token = _cts.Token;
@@ -132,6 +128,14 @@ namespace EODHistoricalDataDownloader.ViewModel
                 foreach (var group in groupsToDownload)
                 {
                     if (token.IsCancellationRequested) break;
+
+                    bool valid = false;
+                    Application.Current.Dispatcher.Invoke(() => valid = ValidateGroup(group));
+                    if (!valid)
+                    {
+                        Application.Current.Dispatcher.Invoke(() => group.GroupStatus = "Skipped");
+                        continue;
+                    }
 
                     Application.Current.Dispatcher.Invoke(() => group.GroupStatus = "Running...");
 

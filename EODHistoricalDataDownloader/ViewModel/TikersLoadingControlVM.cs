@@ -89,11 +89,8 @@ namespace EODHistoricalDataDownloader.ViewModel
         {
             foreach (string ticker in selectedResults)
             {
-                LoadingStatus t = new()
-                {
-                    Ticker = ticker,
-                    Status = TickerStatus.New
-                };
+                var t = new LoadingStatus(ticker) { Status = TickerStatus.New };
+                t.Deleted += LoadingStatus_Deleted;
                 Tickers.Add(t);
             }
         }
@@ -113,7 +110,9 @@ namespace EODHistoricalDataDownloader.ViewModel
                 while (!fstream.EndOfStream)
                 {
                     string text = fstream.ReadLine() ?? "";
-                    Tickers.Add(new LoadingStatus() { Ticker = text });
+                    var t = new LoadingStatus(text);
+                    t.Deleted += LoadingStatus_Deleted;
+                    Tickers.Add(t);
                 }
             }
         }

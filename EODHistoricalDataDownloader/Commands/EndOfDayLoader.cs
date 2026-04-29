@@ -63,6 +63,7 @@ namespace EODHistoricalDataDownloader.Commands
                             status.Status = TickerStatus.Processing;
 
                             DateTime tickerDateFrom = DateFrom;
+                            DateTime tickerDateTo = DateTo;
                             DateTime? lastDate = null;
                             string path = Path.Combine(filePath, $"{status.Ticker}.csv");
 
@@ -70,11 +71,14 @@ namespace EODHistoricalDataDownloader.Commands
                             {
                                 lastDate = csvHistory.GetLastDate(path);
                                 if (lastDate.HasValue)
+                                {
                                     tickerDateFrom = lastDate.Value;
+                                    tickerDateTo = DateTime.Today;
+                                }
                             }
 
                             List<HistoricalStockPrice>? response = await _api.GetEndOfDayHistoricalStockPriceAsync(
-                                status.Ticker, tickerDateFrom, DateTo, Period);
+                                status.Ticker, tickerDateFrom, tickerDateTo, Period);
 
                             if (IsUpdate && lastDate.HasValue && response != null)
                             {

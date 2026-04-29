@@ -6,7 +6,12 @@ namespace EODLoader.Services.Utils
 {
     public class CsvHistoryService : ICsvHistoryService
     {
-        private static readonly string[] DateFormats = { "yyyy-MM-dd", "yyyyMMdd", "M/d/yyyy" };
+        private static readonly string[] DateFormats =
+        {
+            "yyyy-MM-dd", "yyyyMMdd", "M/d/yyyy",
+            "M/d/yyyy h:mm:ss tt", "M/d/yyyy H:mm:ss",
+            "MM/dd/yyyy", "dd/MM/yyyy", "dd.MM.yyyy"
+        };
 
         public DateTime? GetLastDate(string csvPath)
         {
