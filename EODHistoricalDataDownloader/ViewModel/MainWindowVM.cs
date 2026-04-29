@@ -98,7 +98,7 @@ namespace EODHistoricalDataDownloader.ViewModel
             AppName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name
                 + " " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-            WelcomePage WelcomePage = new(Program.Program.GetVersions());
+            WelcomePage WelcomePage = new(Program.Changelog.GetVersions());
             CurrentPage = WelcomePage;
         }
 
