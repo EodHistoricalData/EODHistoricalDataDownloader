@@ -42,36 +42,27 @@ namespace EODLoader.Services.Utils
 
         public bool RewriteDateBeforeLoad(string path, ref DateTime? startDate, ref DateTime? endDate)
         {
-            //Проверка существует ли файл
-            try
+            if (CVSFileIsExist(path))
             {
-                if (CVSFileIsExist(path))
+                if (new FileInfo(path).Length < 2)
                 {
-                    //Проверка не пустой ли файл
-                    if (new FileInfo(path).Length < 2)
-                    {
-                        return false;
-                    }
-
-                    if (DateTime.TryParse(File.ReadLines(path).Last().Split(',')[0], out DateTime dateParse))
-                    {
-                        startDate = dateParse.AddDays(1);
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                    endDate = DateTime.Now;
-
-                    return true;
+                    return false;
                 }
-                return false;
+
+                if (DateTime.TryParse(File.ReadLines(path).Last().Split(',')[0], out DateTime dateParse))
+                {
+                    startDate = dateParse.AddDays(1);
+                }
+                else
+                {
+                    return false;
+                }
+
+                endDate = DateTime.Now;
+
+                return true;
             }
-            catch
-            {
-                throw;
-            }
+            return false;
         }
 
         //Существует ли такой CSV

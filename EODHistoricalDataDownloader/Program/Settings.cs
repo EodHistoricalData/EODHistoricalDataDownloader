@@ -41,17 +41,10 @@ namespace EODHistoricalDataDownloader.Program
         /// </summary>
         internal static void Save()
         {
-            try
-            {
-                if (!Directory.Exists(Program.UserFolder)) Directory.CreateDirectory(Program.UserFolder);
-                XmlSerializer formatter = new(typeof(SettingsFields));
-                using FileStream fs = new(path, FileMode.Create);
-                formatter.Serialize(fs, SettingsFields);
-            }
-            catch
-            {
-                throw;
-            }
+            if (!Directory.Exists(Program.UserFolder)) Directory.CreateDirectory(Program.UserFolder);
+            XmlSerializer formatter = new(typeof(SettingsFields));
+            using FileStream fs = new(path, FileMode.Create);
+            formatter.Serialize(fs, SettingsFields);
         }
     }
 }

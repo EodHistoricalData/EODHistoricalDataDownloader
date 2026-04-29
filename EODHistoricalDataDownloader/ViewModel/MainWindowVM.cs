@@ -80,29 +80,6 @@ namespace EODHistoricalDataDownloader.ViewModel
         }
         private Page _endOfDayPage;
 
-        public Page FundamentalPage
-        {
-            get => _fundamentalPage;
-            set
-            {
-                _fundamentalPage = value;
-                OnPropertyChanged(nameof(FundamentalPage));
-            }
-        }
-        private Page _fundamentalPage;
-
-
-        public Page TaskManagerPage
-        {
-            get => _taskManagerPage;
-            set
-            {
-                _taskManagerPage = value;
-                OnPropertyChanged(nameof(TaskManagerPage));
-            }
-        }
-        private Page _taskManagerPage;
-
         public Page AboutPage
         {
             get => _aboutPage;
@@ -176,43 +153,6 @@ namespace EODHistoricalDataDownloader.ViewModel
             }
         }
 
-        //public ICommand GoToFundamental
-        //{
-        //    get
-        //    {
-        //        return new DelegateCommand((obj) =>
-        //        {
-        //            if (FundamentalPage == null)
-        //            {
-        //                FundamentalPage = new FundamentalPage();
-        //            }
-        //            CurrentPage = FundamentalPage;
-        //        },
-        //        (obj) =>
-        //        {
-        //            return true;
-        //        });
-        //    }
-        //}
-
-        public ICommand GoToTaskManager
-        {
-            get
-            {
-                return new DelegateCommand((obj) =>
-                {
-                    if (TaskManagerPage == null)
-                    {
-                        TaskManagerPage = new TaskManagerPage();
-                    }
-                    CurrentPage = TaskManagerPage;
-                },
-                (obj) =>
-                {
-                    return true;
-                });
-            }
-        }
         public ICommand GoToSettings
         {
             get
