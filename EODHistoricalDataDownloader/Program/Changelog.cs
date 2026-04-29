@@ -1,7 +1,7 @@
-using EODHistoricalDataDownloader.Model;
-
 using System;
 using System.Collections.Generic;
+
+using Version = EODHistoricalDataDownloader.Model.Version;
 
 namespace EODHistoricalDataDownloader.Program
 {
