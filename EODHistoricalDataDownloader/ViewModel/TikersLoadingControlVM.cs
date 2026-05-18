@@ -43,10 +43,11 @@ namespace EODHistoricalDataDownloader.ViewModel
                 return new DelegateCommand((obj) =>
                 {
                     SearchWindow searchWindow = new();
-                    SearchWindowVM searchWindowVM = new();
-                    searchWindow.DataContext = searchWindowVM;
+                    if (searchWindow.DataContext is SearchWindowVM searchWindowVM)
+                    {
+                        searchWindowVM.AddTickersEvent += SearchWindow_AddTickersEvent;
+                    }
                     searchWindow.Show();
-                    searchWindowVM.AddTickersEvent += SearchWindow_AddTickersEvent;
                 },
                 (obj) =>
                 {

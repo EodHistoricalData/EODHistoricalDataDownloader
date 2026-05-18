@@ -11,6 +11,15 @@ namespace EODHistoricalDataDownloader.Program
         {
             new Version
             {
+                Major = 2, Minor = 1, Build = 0, Revision = 2,
+                Name = "2.1.0.2",
+                Date = new DateTime(2026, 5, 18),
+                Description = "\n" +
+                    "- Pre-release fix: Search tickers window now loads results correctly (previous 2.1.0.1 broke Search by removing the wrong DataContext binding)\n" +
+                    "- Pre-release fix: tickers from Search/Import are now added to the currently selected group (inherited from 2.1.0.1)\n"
+            },
+            new Version
+            {
                 Major = 2, Minor = 1, Build = 0, Revision = 1,
                 Name = "2.1.0.1",
                 Date = new DateTime(2026, 5, 18),
