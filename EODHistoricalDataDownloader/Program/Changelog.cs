@@ -11,6 +11,14 @@ namespace EODHistoricalDataDownloader.Program
         {
             new Version
             {
+                Major = 2, Minor = 1, Build = 0, Revision = 1,
+                Name = "2.1.0.1",
+                Date = new DateTime(2026, 5, 18),
+                Description = "\n" +
+                    "- Pre-release fix: tickers added via Search/Import now appear in the selected group's list (was broken by an inline DataContext shadowing the group binding)\n"
+            },
+            new Version
+            {
                 Major = 2, Minor = 1, Build = 0, Revision = 0,
                 Name = "2.1.0.0",
                 Date = new DateTime(2026, 4, 29),
