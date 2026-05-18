@@ -7,10 +7,8 @@
         mc:Ignorable="d"
         Title="Search tickers" Height="400" Width="500"
         WindowStartupLocation="CenterOwner"
-        Style="{StaticResource WindowStyle}">
-    <Window.DataContext>
-        <vm:SearchWindowVM/>
-    </Window.DataContext>
+        Style="{StaticResource WindowStyle}"
+        d:DataContext="{d:DesignInstance Type=vm:SearchWindowVM, IsDesignTimeCreatable=True}">
 
     <Grid>
         <Grid.RowDefinitions>
