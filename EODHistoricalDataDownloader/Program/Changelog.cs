@@ -11,6 +11,14 @@ namespace EODHistoricalDataDownloader.Program
         {
             new Version
             {
+                Major = 2, Minor = 1, Build = 0, Revision = 4,
+                Name = "2.1.0.4",
+                Date = new DateTime(2026, 5, 19),
+                Description = "\n" +
+                    "- Settings page polish: \"Simultaneously connections\" → \"Simultaneous connections\", \"Api key\" → \"API key\", \"User name\" → \"Username\".\n"
+            },
+            new Version
+            {
                 Major = 2, Minor = 1, Build = 0, Revision = 3,
                 Name = "2.1.0.3",
                 Date = new DateTime(2026, 5, 19),
