@@ -11,6 +11,15 @@ namespace EODHistoricalDataDownloader.Program
         {
             new Version
             {
+                Major = 2, Minor = 1, Build = 0, Revision = 3,
+                Name = "2.1.0.3",
+                Date = new DateTime(2026, 5, 19),
+                Description = "\n" +
+                    "- Pre-release fix: Search tickers window no longer hangs on API errors (missing/invalid APIKey, network failure). Errors are now shown as a status message instead of freezing the app.\n" +
+                    "- Pre-release fix: Search tickers reuses a single API client instance per session instead of allocating one per keystroke.\n"
+            },
+            new Version
+            {
                 Major = 2, Minor = 1, Build = 0, Revision = 2,
                 Name = "2.1.0.2",
                 Date = new DateTime(2026, 5, 18),

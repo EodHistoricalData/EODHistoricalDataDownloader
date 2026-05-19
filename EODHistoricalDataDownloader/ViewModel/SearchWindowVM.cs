@@ -4,6 +4,7 @@ using EOD.Model;
 using EODHistoricalDataDownloader.Program;
 using EODHistoricalDataDownloader.Utils;
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace EODHistoricalDataDownloader.ViewModel
         public ObservableCollection<Model.SearchResult> SearchResults { get; set; }
 
         private CancellationTokenSource? _searchCts;
+        private API? _api;
+        private string _apiKeyForApi = "";
 
         public string SearchString
         {
@@ -33,6 +36,13 @@ namespace EODHistoricalDataDownloader.ViewModel
             }
         }
         string _searchString = "";
+
+        private string _statusMessage = "";
+        public string StatusMessage
+        {
+            get => _statusMessage;
+            set { _statusMessage = value; OnPropertyChanged(nameof(StatusMessage)); }
+        }
 
         public SearchWindowVM()
         {
@@ -72,27 +82,54 @@ namespace EODHistoricalDataDownloader.ViewModel
             {
                 await Task.Delay(300, token);
                 if (token.IsCancellationRequested) return;
-                await GetTickers();
+                await GetTickers(token);
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
-                // Debounce cancelled — expected
+                // expected on debounce / window close
+            }
+            catch (Exception ex)
+            {
+                // async void poison: must not let exceptions reach the dispatcher
+                StatusMessage = $"Search failed: {ex.Message}";
             }
         }
 
-        private async Task GetTickers()
+        private async Task GetTickers(CancellationToken token)
         {
-            if (!string.IsNullOrWhiteSpace(SearchString))
+            if (string.IsNullOrWhiteSpace(SearchString))
             {
-                string apiKey = Settings.SettingsFields?.APIKey ?? "demo";
-                API _api = new(apiKey, null);
-                List<SearchResult> results = await _api.GetSearchResultAsync(SearchString);
                 SearchResults.Clear();
-                foreach (SearchResult result in results)
-                {
-                    SearchResults.Add(new Model.SearchResult(result));
-                }
+                StatusMessage = "";
+                return;
             }
+
+            string apiKey = Settings.SettingsFields?.APIKey ?? "";
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                SearchResults.Clear();
+                StatusMessage = "Set your APIKey in Settings to search tickers.";
+                return;
+            }
+
+            if (_api == null || _apiKeyForApi != apiKey)
+            {
+                _api = new API(apiKey, null);
+                _apiKeyForApi = apiKey;
+            }
+
+            StatusMessage = "Searching…";
+
+            List<SearchResult> results = await _api.GetSearchResultAsync(SearchString);
+            if (token.IsCancellationRequested) return;
+
+            SearchResults.Clear();
+            foreach (SearchResult result in results)
+            {
+                SearchResults.Add(new Model.SearchResult(result));
+            }
+
+            StatusMessage = results.Count == 0 ? "No results." : "";
         }
     }
 }
