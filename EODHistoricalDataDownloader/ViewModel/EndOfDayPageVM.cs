@@ -1,12 +1,11 @@
-﻿using EODHistoricalDataDownloader.Commands;
+using EODHistoricalDataDownloader.Commands;
 using EODHistoricalDataDownloader.Model;
 using EODHistoricalDataDownloader.Program;
 using EODHistoricalDataDownloader.Utils;
 
-using Microsoft.WindowsAPICodePack.Dialogs;
-
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -21,257 +20,206 @@ namespace EODHistoricalDataDownloader.ViewModel
 {
     internal class EndOfDayPageVM : BaseVM
     {
-        public TikersLoadingControlVM TikersLoadingControlVM { get; set; }
+        private CancellationTokenSource _cts = new();
 
-        readonly CancellationTokenSource source = new();
+        public ObservableCollection<DownloadGroupVM> Groups { get; set; } = new();
 
-        public static List<string> ListOfPeriod { get; set; } = new() { "Daily", "Weekly", "Monthly" };
-        public static List<string> ListOfFormat { get; set; } = new() { "Metastock", "Amibroker" };
-        public static List<string> ListOfOutput { get; set; } = new() { "All in one file", "Separate files" };
-
-        public string? Period
+        private DownloadGroupVM? _selectedGroup;
+        public DownloadGroupVM? SelectedGroup
         {
-            get => _period;
-            set
-            {
-                _period = value;
-                OnPropertyChanged(nameof(Period));
-                Settings.SettingsFields.EndOfDayPeriod = Period;
-                Settings.Save();
-            }
+            get => _selectedGroup;
+            set { _selectedGroup = value; OnPropertyChanged(nameof(SelectedGroup)); }
         }
-        private string? _period = Settings.SettingsFields.EndOfDayPeriod;
-
-        public string? Format
-        {
-            get => _format;
-            set
-            {
-                _format = value;
-                OnPropertyChanged(nameof(Format));
-                Settings.SettingsFields.EndOfDayFormat = Format;
-                Settings.Save();
-            }
-        }
-        private string? _format = string.IsNullOrEmpty(Settings.SettingsFields.EndOfDayFormat) ? "Metastock" : Settings.SettingsFields.EndOfDayFormat;
-
-        public string? Output
-        {
-            get => _output;
-            set
-            {
-                _output = value;
-                OnPropertyChanged(nameof(Output));
-                Settings.SettingsFields.EndOfDayOutput = Output;
-                Settings.Save();
-            }
-        }
-        private string? _output = Settings.SettingsFields.EndOfDayOutput;
-
-        public DateTime DateFrom
-        {
-            get => _dateFrom;
-            set
-            {
-                _dateFrom = value;
-                OnPropertyChanged(nameof(DateFrom));
-                Settings.SettingsFields.EndOfDayFrom = DateFrom;
-                Settings.Save();
-            }
-        }
-        private DateTime _dateFrom = Settings.SettingsFields.EndOfDayFrom;
-
-        public DateTime DateTo
-        {
-            get => _dateTo;
-            set
-            {
-                _dateTo = value;
-                OnPropertyChanged(nameof(DateTo));
-                Settings.SettingsFields.EndOfDayTo = DateTo;
-                Settings.Save();
-            }
-        }
-        private DateTime _dateTo = Settings.SettingsFields.EndOfDayTo;
-
-        /// <summary>
-        /// file save directory
-        /// </summary>
-        public string FilePath
-        {
-            get => _filePath;
-            set
-            {
-                _filePath = value;
-                OnPropertyChanged(nameof(FilePath));
-                Settings.SettingsFields.EndOfDayFilePath = FilePath;
-                Settings.Save();
-            }
-        }
-        private string _filePath = Settings.SettingsFields.EndOfDayFilePath;
-
-        public bool IsUpdate
-        {
-            get => _isUpdate;
-            set
-            {
-                _isUpdate = value;
-                OnPropertyChanged(nameof(IsUpdate));
-                Settings.SettingsFields.EndOfDayIsUpdate = IsUpdate;
-                Settings.Save();
-            }
-        }
-        private bool _isUpdate = Settings.SettingsFields.EndOfDayIsUpdate;
-
-        public WebProxy Proxy
-        {
-            get => _proxy;
-            set
-            {
-                _proxy = value;
-            }
-        }
-        private WebProxy _proxy;
 
         public EndOfDayPageVM()
         {
-            if (Settings.SettingsFields.EndOfDayTickers == null)
+            var groups = Settings.SettingsFields.EndOfDayGroups;
+            if (groups != null && groups.Count > 0)
             {
-                TikersLoadingControlVM = new TikersLoadingControlVM();
+                foreach (var model in groups)
+                {
+                    var vm = CreateGroupVM(model);
+                    Groups.Add(vm);
+                }
             }
             else
             {
-                TikersLoadingControlVM = new TikersLoadingControlVM(Settings.SettingsFields.EndOfDayTickers);
+                var defaultGroup = new DownloadGroup { Name = "Default" };
+                Settings.SettingsFields.EndOfDayGroups = new List<DownloadGroup> { defaultGroup };
+                var vm = CreateGroupVM(defaultGroup);
+                Groups.Add(vm);
             }
+
+            SelectedGroup = Groups.FirstOrDefault();
         }
 
-        /// <summary>
-        /// Selecting a directory to save the file to
-        /// </summary>
-        public ICommand SelectFilePath
+        private DownloadGroupVM CreateGroupVM(DownloadGroup model)
         {
-            get
+            var vm = new DownloadGroupVM(model);
+            vm.DeleteRequested += OnDeleteGroupRequested;
+            return vm;
+        }
+
+        private void OnDeleteGroupRequested(DownloadGroupVM group)
+        {
+            if (Groups.Count <= 1)
             {
-                return new DelegateCommand((obj) =>
+                MessageBox.Show("At least one group must exist.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            group.DeleteRequested -= OnDeleteGroupRequested;
+            Groups.Remove(group);
+            Settings.SettingsFields.EndOfDayGroups?.Remove(group.GetModel());
+
+            if (SelectedGroup == group)
+                SelectedGroup = Groups.FirstOrDefault();
+
+            Settings.SaveDebounced();
+        }
+
+        public ICommand AddGroup => new DelegateCommand((obj) =>
+        {
+            var groupNumber = Groups.Count + 1;
+            var model = new DownloadGroup { Name = $"Group {groupNumber}" };
+
+            Settings.SettingsFields.EndOfDayGroups ??= new List<DownloadGroup>();
+            Settings.SettingsFields.EndOfDayGroups.Add(model);
+
+            var vm = CreateGroupVM(model);
+            Groups.Add(vm);
+            SelectedGroup = vm;
+            Settings.SaveDebounced();
+        });
+
+        /// <summary>
+        /// Download the currently selected group
+        /// </summary>
+        public ICommand LoadToCsvFiles => new DelegateCommand((obj) =>
+        {
+            if (SelectedGroup == null) return;
+            if (!ValidateGroup(SelectedGroup)) return;
+
+            _cts = new CancellationTokenSource();
+            var token = _cts.Token;
+
+            SelectedGroup.GroupStatus = "Running...";
+            PrepareAndDownloadGroup(SelectedGroup, token).ContinueWith(t =>
+            {
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    CommonOpenFileDialog dialog = new()
-                    {
-                        InitialDirectory = FilePath,
-                        IsFolderPicker = true
-                    };
-                    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                    {
-                        FilePath = dialog.FileName;
-                    }
-                },
-                (obj) =>
-                {
-                    return true;
+                    SelectedGroup.GroupStatus = t.IsFaulted ? "Error" : "Done";
                 });
-            }
-        }
+            });
+        });
 
         /// <summary>
-        /// Load data and save to Csv file (button click)
+        /// Download all groups sequentially
         /// </summary>
-        public ICommand LoadToCsvFiles
+        public ICommand LoadAllGroups => new DelegateCommand((obj) =>
         {
-            get
+            var groupsToDownload = Groups.ToList();
+
+            _cts = new CancellationTokenSource();
+            var token = _cts.Token;
+
+            _ = Task.Run(async () =>
             {
-                return new DelegateCommand((obj) =>
+                foreach (var group in groupsToDownload)
                 {
-                    if (!ValidateStart())
+                    if (token.IsCancellationRequested) break;
+
+                    bool valid = false;
+                    Application.Current.Dispatcher.Invoke(() => valid = ValidateGroup(group));
+                    if (!valid)
                     {
-                        return;
+                        Application.Current.Dispatcher.Invoke(() => group.GroupStatus = "Skipped");
+                        continue;
                     }
 
-                    List<string> listOfTickers = new();
-                    foreach (var loadingStatus in TikersLoadingControlVM.Tickers)
+                    Application.Current.Dispatcher.Invoke(() => group.GroupStatus = "Running...");
+
+                    try
                     {
-                        listOfTickers.Add(loadingStatus.Ticker);
-                        loadingStatus.Status = "Waiting";
-                        loadingStatus.Filename = "";
+                        await PrepareAndDownloadGroup(group, token);
+                        Application.Current.Dispatcher.Invoke(() => group.GroupStatus = "Done");
                     }
-                    Settings.SettingsFields.EndOfDayTickers = listOfTickers;
-                    Settings.Save();
-
-                    string apiKey = Settings.SettingsFields.APIKey;
-                    List<LoadingStatus> loadingStatuses = TikersLoadingControlVM.Tickers.ToList();
-                    HistoricalPeriod historicalPeriod = Period switch
+                    catch (OperationCanceledException)
                     {
-                        "Daily" => HistoricalPeriod.Daily,
-                        "Weekly" => HistoricalPeriod.Weekly,
-                        "Monthly" => HistoricalPeriod.Monthly,
-                        _ => HistoricalPeriod.Daily
-                    };
-                    DateTime dateFrom = DateFrom;
-                    DateTime dateTo = DateTo;
-                    string filePath = FilePath;
-                    int maxThreads = Settings.SettingsFields.MaxThreads;
-                    if (maxThreads > Environment.ProcessorCount * 2) maxThreads = Environment.ProcessorCount * 2;
-                    if (Settings.SettingsFields.UseProxy)
-                        try
-                        {
-                            Proxy = new(Settings.SettingsFields.ProxyHost);
-                            if (Settings.SettingsFields.WithCredentials)
-                            {
-                                Proxy.Credentials = new NetworkCredential(Settings.SettingsFields.ProxyUsername, Settings.SettingsFields.ProxyPassword);
-                            }
-                        }
-                        catch (Exception)
-                        {
+                        Application.Current.Dispatcher.Invoke(() => group.GroupStatus = "Cancelled");
+                        break;
+                    }
+                    catch
+                    {
+                        Application.Current.Dispatcher.Invoke(() => group.GroupStatus = "Error");
+                    }
+                }
+            }, token);
+        });
 
-                        }
-                    var proxy = Proxy;
-                    bool isUpdate = IsUpdate;
-                    bool oneFile = Output == "All in one file";
-                    var loader = new EndOfDayLoader(apiKey, loadingStatuses, historicalPeriod, dateFrom, dateTo, maxThreads, proxy, isUpdate, oneFile);
-                    Task.Run(() => loader.LoadToCsv(filePath, source), source.Token);
-                },
-                (obj) =>
+        public ICommand CancelSavingFiles => new DelegateCommand((obj) =>
+        {
+            _cts.Cancel();
+        });
+
+        private async Task PrepareAndDownloadGroup(DownloadGroupVM group, CancellationToken ct)
+        {
+            group.SyncTickersToModel();
+
+            var loadingStatuses = group.TikersLoadingControlVM.Tickers.ToList();
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                foreach (var status in loadingStatuses)
                 {
-                    return true;
-                });
-            }
+                    status.Status = TickerStatus.Waiting;
+                    status.Filename = "";
+                }
+            });
+
+            Settings.Save();
+
+            string apiKey = Settings.SettingsFields.APIKey;
+            HistoricalPeriod period = group.Period switch
+            {
+                "Daily" => HistoricalPeriod.Daily,
+                "Weekly" => HistoricalPeriod.Weekly,
+                "Monthly" => HistoricalPeriod.Monthly,
+                _ => HistoricalPeriod.Daily
+            };
+
+            int maxThreads = Settings.SettingsFields.MaxThreads;
+            if (maxThreads > Environment.ProcessorCount * 2)
+                maxThreads = Environment.ProcessorCount * 2;
+
+            var proxy = ProxyFactory.Create();
+            bool oneFile = group.Output == "All in one file";
+
+            var loader = new EndOfDayLoader(
+                apiKey, loadingStatuses, period,
+                group.DateFrom, group.DateTo,
+                maxThreads, proxy, group.IsUpdate, oneFile);
+
+            await loader.LoadToCsvAsync(group.FilePath, ct);
         }
 
-        /// <summary>
-        /// Canceling data loading
-        /// </summary>
-        public ICommand CancelSavingFiles
+        private bool ValidateGroup(DownloadGroupVM group)
         {
-            get
-            {
-                return new DelegateCommand((obj) =>
-                {
-                    source.Cancel();
-                },
-                (obj) =>
-                {
-                    return true;
-                });
-            }
-        }
+            string prefix = Groups.Count > 1 ? $"[{group.Name}] " : "";
 
-        /// <summary>
-        /// Checking download directory field and tiker list
-        /// </summary>
-        /// <returns>False when download directory is empty or do not exist or ticker list is empty</returns>
-        private bool ValidateStart()
-        {
-            if (FilePath == string.Empty)
+            if (string.IsNullOrEmpty(group.FilePath))
             {
-                MessageBox.Show("The download directory field is empty", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"{prefix}The download directory field is empty", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
-            if (!Directory.Exists(FilePath))
+            if (!Directory.Exists(group.FilePath))
             {
-                MessageBox.Show("Selected download directory do not exist", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"{prefix}Selected download directory does not exist", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
-            if (TikersLoadingControlVM.Tickers.Count == 0)
+            if (group.TikersLoadingControlVM.Tickers.Count == 0)
             {
-                MessageBox.Show("The ticker list is empty", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"{prefix}The ticker list is empty", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
             return true;

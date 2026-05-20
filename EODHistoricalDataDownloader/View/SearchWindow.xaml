@@ -51,18 +51,23 @@
             </DataGrid>
         </ScrollViewer>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,2,0">
-            <Button  Width="130"
-                     Style="{StaticResource LoadButton}" 
-                     Command="{Binding AddTickers}">
+        <DockPanel Grid.Row="2" LastChildFill="True" Margin="6,0,2,0">
+            <Button DockPanel.Dock="Right"
+                    Width="130"
+                    Style="{StaticResource LoadButton}"
+                    Command="{Binding AddTickers}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Path Style="{DynamicResource MenuIcon}" Data="{DynamicResource addStyle0}" />
                     <TextBlock Text="Add tickers"
-                               VerticalAlignment="Center" 
+                               VerticalAlignment="Center"
                                TextAlignment="Center"/>
                 </StackPanel>
             </Button>
 
-        </StackPanel>
+            <TextBlock Text="{Binding StatusMessage}"
+                       VerticalAlignment="Center"
+                       TextTrimming="CharacterEllipsis"
+                       Opacity="0.75"/>
+        </DockPanel>
     </Grid>
 </Window>

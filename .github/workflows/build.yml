@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  push:
+    branches: [ master, refactor/**, feat/**, release/** ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Read version from .csproj
+        id: version
+        shell: pwsh
+        run: |
+          [xml]$proj = Get-Content EODHistoricalDataDownloader/EODHistoricalDataDownloader.csproj
+          $v = $proj.Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+          "version=$v" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Detected version: $v"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EODHistoricalDataDownloader-v${{ steps.version.outputs.version }}-${{ github.sha }}
+          path: EODHistoricalDataDownloader/bin/Release/
+          retention-days: 30

@@ -43,10 +43,11 @@ namespace EODHistoricalDataDownloader.ViewModel
                 return new DelegateCommand((obj) =>
                 {
                     SearchWindow searchWindow = new();
-                    SearchWindowVM searchWindowVM = new();
-                    searchWindow.DataContext = searchWindowVM;
+                    if (searchWindow.DataContext is SearchWindowVM searchWindowVM)
+                    {
+                        searchWindowVM.AddTickersEvent += SearchWindow_AddTickersEvent;
+                    }
                     searchWindow.Show();
-                    searchWindowVM.AddTickersEvent += SearchWindow_AddTickersEvent;
                 },
                 (obj) =>
                 {
@@ -89,11 +90,8 @@ namespace EODHistoricalDataDownloader.ViewModel
         {
             foreach (string ticker in selectedResults)
             {
-                LoadingStatus t = new()
-                {
-                    Ticker = ticker,
-                    Status = "New"
-                };
+                var t = new LoadingStatus(ticker) { Status = TickerStatus.New };
+                t.Deleted += LoadingStatus_Deleted;
                 Tickers.Add(t);
             }
         }
@@ -110,12 +108,13 @@ namespace EODHistoricalDataDownloader.ViewModel
                 string filePath = openFileDialog.FileName;
 
                 using StreamReader fstream = new(filePath);
-                while (!fstream?.EndOfStream ?? true)
+                while (!fstream.EndOfStream)
                 {
-                    string text = fstream?.ReadLine() ?? "";
-                    Tickers.Add(new LoadingStatus() { Ticker = text });
+                    string text = fstream.ReadLine() ?? "";
+                    var t = new LoadingStatus(text);
+                    t.Deleted += LoadingStatus_Deleted;
+                    Tickers.Add(t);
                 }
-                fstream?.Close();
             }
         }
     }

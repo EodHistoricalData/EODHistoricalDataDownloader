@@ -1,4 +1,4 @@
-﻿using EOD;
+using EOD;
 using EOD.Model;
 
 using EODHistoricalDataDownloader.Model;
@@ -6,12 +6,13 @@ using EODHistoricalDataDownloader.Model;
 using EODLoader.Services.Utils;
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using static EOD.API;
 
 namespace EODHistoricalDataDownloader.Commands
@@ -42,101 +43,99 @@ namespace EODHistoricalDataDownloader.Commands
             OneFile = oneFile;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filePath"></param>
-        internal void LoadToCsv(string filePath, CancellationTokenSource? source = null)
+        internal async Task LoadToCsvAsync(string filePath, CancellationToken ct = default)
         {
-            source ??= new CancellationTokenSource();
-
-            var queue = new Queue<LoadingStatus>(LoadingStatuses);
             var _api = new API(ApiKey, Proxy, Program.Program.ProgramName);
             IUtilsService utils = new UtilsService();
-            List<Task> tasks = new();
-            if (!OneFile)
-            {
-                while (queue.TryPeek(out LoadingStatus _))
-                {
-                    LoadingStatus status = queue.Dequeue();
+            using var semaphore = new SemaphoreSlim(MaxThreads);
 
-                    var reqSave = Task.Factory.StartNew(async () =>
+            try
+            {
+                if (!OneFile)
+                {
+                    var tasks = LoadingStatuses.Select(status => Task.Run(async () =>
                     {
+                        await semaphore.WaitAsync(ct);
                         try
                         {
-                            status.Status = "Processing";
-                            List<IntradayHistoricalStockPrice>? response = _api.GetIntradayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Interval).Result;
-                            string path = $@"{filePath}\{status.Ticker}.csv";
+                            ct.ThrowIfCancellationRequested();
+                            status.Status = TickerStatus.Processing;
+                            List<IntradayHistoricalStockPrice>? response = await _api.GetIntradayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Interval);
+                            string path = Path.Combine(filePath, $"{status.Ticker}.csv");
                             await utils.CreateCVSFile(response, path, IsUpdate);
-                            status.Status = "OK";
+                            status.Status = TickerStatus.OK;
                             status.Filename = path;
                         }
+                        catch (OperationCanceledException)
+                        {
+                            status.Status = TickerStatus.Error;
+                            status.Filename = "Cancelled";
+                        }
                         catch (Exception ex)
                         {
-                            status.Status = "Error";
+                            status.Status = TickerStatus.Error;
                             status.Filename = ex.Message;
                         }
-                    }, source.Token);
-                    tasks.Add(reqSave);
+                        finally
+                        {
+                            semaphore.Release();
+                        }
+                    }, ct)).ToList();
 
-                    if (tasks.Count >= MaxThreads)
-                    {
-                        int i = Task.WaitAny(tasks.ToArray());
-                        tasks.Remove(tasks[i]);
-                    }
+                    await Task.WhenAll(tasks);
                 }
-            }
-            else
-            {
-                List<IntradayHistoricalStockPriceTicker>? responseTickerList = new();
-
-                while (queue.TryPeek(out LoadingStatus _))
+                else
                 {
-                    List<IntradayHistoricalStockPrice>? response;
-                    LoadingStatus status = queue.Dequeue();
+                    var responseTickerList = new ConcurrentBag<IntradayHistoricalStockPriceTicker>();
 
-                    var reqSave = Task.Factory.StartNew(() =>
+                    var tasks = LoadingStatuses.Select(status => Task.Run(async () =>
                     {
+                        await semaphore.WaitAsync(ct);
                         try
                         {
-                            status.Status = "Processing";
-                            response = _api.GetIntradayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Interval).Result;
+                            ct.ThrowIfCancellationRequested();
+                            status.Status = TickerStatus.Processing;
+                            List<IntradayHistoricalStockPrice>? response = await _api.GetIntradayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Interval);
                             foreach (var item in response)
                             {
-                                var responseTicker = new IntradayHistoricalStockPriceTicker(status.Ticker, item);
-                                responseTickerList.Add(responseTicker);
+                                responseTickerList.Add(new IntradayHistoricalStockPriceTicker(status.Ticker, item));
                             }
+                            status.Status = TickerStatus.OK;
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            status.Status = TickerStatus.Error;
+                            status.Filename = "Cancelled";
                         }
                         catch (Exception ex)
                         {
-                            status.Status = "Error";
+                            status.Status = TickerStatus.Error;
                             status.Filename = ex.Message;
                         }
-                    }, source.Token);
-                    tasks.Add(reqSave);
+                        finally
+                        {
+                            semaphore.Release();
+                        }
+                    }, ct)).ToList();
 
-                    if (tasks.Count >= MaxThreads)
-                    {
-                        int i = Task.WaitAny(tasks.ToArray());
-                        tasks.Remove(tasks[i]);
-                    }
+                    await Task.WhenAll(tasks);
+
+                    var sortedList = responseTickerList.OrderBy(x => x.Ticker).ToList();
+                    string path = Path.Combine(filePath, "Intraday Tickers.csv");
+                    await utils.CreateCVSFile(sortedList, path, IsUpdate);
                 }
-
-                Task.WaitAll(tasks.ToArray());
-                Task.Factory.StartNew(async () =>
-                {
-                    try
-                    {
-                        List<IntradayHistoricalStockPriceTicker>? sortedList = responseTickerList.OrderBy(x => x.Ticker).ToList();
-                        string path = $@"{filePath}\Intraday Tickers.csv";
-                        await utils.CreateCVSFile(sortedList, path, IsUpdate);
-                        LoadingStatuses.FindAll(s => s.Status == "Processing").ForEach(s => s.Status = "Ok");
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                });
+            }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is expected — no action needed
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"IntradayLoader error: {ex}");
+                LoadingStatuses
+                    .Where(s => s.Status == TickerStatus.Processing)
+                    .ToList()
+                    .ForEach(s => { s.Status = TickerStatus.Error; s.Filename = ex.Message; });
             }
         }
     }

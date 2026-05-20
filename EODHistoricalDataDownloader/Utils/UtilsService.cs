@@ -25,59 +25,29 @@ namespace EODLoader.Services.Utils
                 using StreamWriter writer = new(File.Open(path, FileMode.Append));
                 foreach (var item in items)
                 {
-                    writer.WriteLine(string.Join(",", props.Select(p => p.GetValue(item, null))));
+                    writer.WriteLine(string.Join(",", props.Select(p => EscapeCsvField(p.GetValue(item, null)))));
                 }
             }
             else
             {
                 using StreamWriter writer = new(path);
-                writer.WriteLine(string.Join(",", props.Select(p => p.Name)));
+                writer.WriteLine(string.Join(",", props.Select(p => EscapeCsvField(p.Name))));
 
                 foreach (var item in items)
                 {
-                    writer.WriteLine(string.Join(",", props.Select(p => p.GetValue(item, null))));
+                    writer.WriteLine(string.Join(",", props.Select(p => EscapeCsvField(p.GetValue(item, null)))));
                 }
             }
         }
 
-        public bool RewriteDateBeforeLoad(string path, ref DateTime? startDate, ref DateTime? endDate)
+        private static string EscapeCsvField(object? value)
         {
-            //Проверка существует ли файл
-            try
-            {
-                if (CVSFileIsExist(path))
-                {
-                    //Проверка не пустой ли файл
-                    if (new FileInfo(path).Length < 2)
-                    {
-                        return false;
-                    }
-
-                    if (DateTime.TryParse(File.ReadLines(path).Last().Split(',')[0], out DateTime dateParse))
-                    {
-                        startDate = dateParse.AddDays(1);
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                    endDate = DateTime.Now;
-
-                    return true;
-                }
-                return false;
-            }
-            catch
-            {
-                throw;
-            }
+            if (value == null) return "";
+            string field = value.ToString() ?? "";
+            if (field.Contains(',') || field.Contains('"') || field.Contains('\n') || field.Contains('\r'))
+                return "\"" + field.Replace("\"", "\"\"") + "\"";
+            return field;
         }
 
-        //Существует ли такой CSV
-        private static bool CVSFileIsExist(string path)
-        {
-            return File.Exists(path);
-        }
     }
 }

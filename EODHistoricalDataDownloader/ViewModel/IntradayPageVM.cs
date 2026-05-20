@@ -24,13 +24,17 @@ namespace EODHistoricalDataDownloader.ViewModel
     {
         public TikersLoadingControlVM TikersLoadingControlVM { get; set; }
 
-        readonly CancellationTokenSource source = new();
+        private CancellationTokenSource _cts = new();
 
         public static List<string> ListOfInterval { get; set; } = new() { "1 minute", "5 minutes", "1 hour" };
         public static List<string> ListOfFormat { get; set; } = new() { "Metastock", "Amibroker" };
         public static List<string> ListOfOutput { get; set; } = new() { "All in one file", "Separate files" };
 
-        private bool validated = false;
+        private bool _isValidating = false;
+
+        private const int MaxDaysOneMinute = 120;
+        private const int MaxDaysFiveMinutes = 600;
+        private const int MaxDaysOneHour = 7200;
 
         public string Interval
         {
@@ -41,7 +45,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 OnPropertyChanged(nameof(Interval));
                 ValidateDates();
                 Settings.SettingsFields.IntradayInterval = Interval;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private string _interval = Settings.SettingsFields.IntradayInterval;
@@ -54,7 +58,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _format = value;
                 OnPropertyChanged(nameof(Format));
                 Settings.SettingsFields.IntradayFormat = Format;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private string? _format = string.IsNullOrEmpty(Settings.SettingsFields.IntradayFormat) ? "Metastock" : Settings.SettingsFields.IntradayFormat;
@@ -67,7 +71,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _output = value;
                 OnPropertyChanged(nameof(Output));
                 Settings.SettingsFields.IntradayOutput = Output;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private string? _output = Settings.SettingsFields.IntradayOutput;
@@ -81,7 +85,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 OnPropertyChanged(nameof(DateFrom));
                 ValidateDates();
                 Settings.SettingsFields.IntradayFrom = DateFrom;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         DateTime _dateFrom = Settings.SettingsFields.IntradayFrom;
@@ -95,7 +99,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 OnPropertyChanged(nameof(DateTo));
                 ValidateDates();
                 Settings.SettingsFields.IntradayTo = DateTo;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         DateTime _dateTo = Settings.SettingsFields.IntradayTo;
@@ -111,7 +115,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _filePath = value;
                 OnPropertyChanged(nameof(FilePath));
                 Settings.SettingsFields.IntradayFilePath = FilePath;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private string _filePath = Settings.SettingsFields.IntradayFilePath;
@@ -124,20 +128,10 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _isUpdate = value;
                 OnPropertyChanged(nameof(IsUpdate));
                 Settings.SettingsFields.IntradayIsUpdate = IsUpdate;
-                Settings.Save();
+                Settings.SaveDebounced();
             }
         }
         private bool _isUpdate = Settings.SettingsFields.IntradayIsUpdate;
-
-        public WebProxy Proxy
-        {
-            get => _proxy;
-            set
-            {
-                _proxy = value;
-            }
-        }
-        private WebProxy _proxy;
 
         public IntradayPageVM()
         {
@@ -190,7 +184,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                     foreach (var loadingStatus in TikersLoadingControlVM.Tickers)
                     {
                         listOfTickers.Add(loadingStatus.Ticker);
-                        loadingStatus.Status = "Waiting";
+                        loadingStatus.Status = TickerStatus.Waiting;
                         loadingStatus.Filename = "";
                     }
                     Settings.SettingsFields.IntradayTickers = listOfTickers;
@@ -214,24 +208,13 @@ namespace EODHistoricalDataDownloader.ViewModel
                     string filePath = FilePath;
                     int maxThreads = Settings.SettingsFields.MaxThreads;
                     if (maxThreads > Environment.ProcessorCount * 2) maxThreads = Environment.ProcessorCount * 2;
-                    if (Settings.SettingsFields.UseProxy)
-                        try
-                        {
-                            Proxy = new(Settings.SettingsFields.ProxyHost);
-                            if (Settings.SettingsFields.WithCredentials)
-                            {
-                                Proxy.Credentials = new NetworkCredential(Settings.SettingsFields.ProxyUsername, Settings.SettingsFields.ProxyPassword);
-                            }
-                        }
-                        catch (Exception)
-                        {
-
-                        }
-                    var proxy = Proxy;
+                    var proxy = ProxyFactory.Create();
                     bool isUpdate = IsUpdate;
                     bool oneFile = Output == "All in one file";
+                    _cts = new CancellationTokenSource();
+                    var token = _cts.Token;
                     var loader = new IntradayLoader(apiKey, loadingStatuses, interval, dateFrom, dateTo, maxThreads, proxy, isUpdate, oneFile);
-                    Task.Run(() => loader.LoadToCsv(filePath, source), source.Token);
+                    _ = Task.Run(async () => await loader.LoadToCsvAsync(filePath, token), token);
                 },
                 (obj) =>
                 {
@@ -248,7 +231,7 @@ namespace EODHistoricalDataDownloader.ViewModel
             {
                 return new DelegateCommand((obj) =>
                 {
-                    source.Cancel();
+                    _cts.Cancel();
                 },
                 (obj) =>
                 {
@@ -283,43 +266,30 @@ namespace EODHistoricalDataDownloader.ViewModel
 
         private void ValidateDates()
         {
-            if (validated)
+            if (_isValidating) return;
+
+            int? maxDays = Interval switch
             {
-                validated = false;
-                return;
-            }
-            validated = true;
-            int maxDays;
-            TimeSpan delta;
-            switch (Interval)
+                "1 minute" => MaxDaysOneMinute,
+                "5 minutes" => MaxDaysFiveMinutes,
+                "1 hour" => MaxDaysOneHour,
+                _ => null
+            };
+
+            if (maxDays == null) return;
+
+            TimeSpan delta = DateTo - DateFrom;
+            if (delta.TotalDays >= maxDays.Value)
             {
-                case "1 minute":
-                    maxDays = 120;
-                    delta = (TimeSpan)(DateTo - DateFrom);
-                    if (delta.TotalDays >= maxDays)
-                    {
-                        TimeSpan interval = new TimeSpan(119, 23, 59, 59, 0);
-                        DateFrom = DateTo - interval;
-                    }
-                    break;
-                case "5 minutes":
-                    maxDays = 600;
-                    delta = (TimeSpan)(DateTo - DateFrom);
-                    if (delta.TotalDays >= maxDays)
-                    {
-                        TimeSpan interval = new TimeSpan(599, 23, 59, 59, 0);
-                        DateFrom = DateTo - interval;
-                    }
-                    break;
-                case "1 hour":
-                    maxDays = 7200;
-                    delta = (TimeSpan)(DateTo - DateFrom);
-                    if (delta.TotalDays >= maxDays)
-                    {
-                        TimeSpan interval = new TimeSpan(7199, 23, 59, 59, 0);
-                        DateFrom = DateTo - interval;
-                    }
-                    break;
+                _isValidating = true;
+                try
+                {
+                    DateFrom = DateTo - new TimeSpan(maxDays.Value - 1, 23, 59, 59, 0);
+                }
+                finally
+                {
+                    _isValidating = false;
+                }
             }
         }
     }
