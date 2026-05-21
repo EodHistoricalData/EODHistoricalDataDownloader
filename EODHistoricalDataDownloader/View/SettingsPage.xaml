@@ -76,8 +76,7 @@
 
         <Label Grid.Column="0" Content="Simultaneous connections: " HorizontalContentAlignment="Right" Grid.Row="2"/>
         <CheckBox Grid.Column="1" Grid.Row="2" Margin="7" VerticalAlignment="Center"
-                  IsChecked="{Binding TwoConnections}"
-                  Content="Use 2 connections (default: 1)"/>
+                  IsChecked="{Binding TwoConnections}"/>
 
         <Label Grid.Column="0" Content="Use proxy: " HorizontalContentAlignment="Right" Grid.Row="3"/>
         <CheckBox Name="cbx_UseProxy" Grid.Column="1" Grid.Row="3" Margin="7" IsChecked="{Binding UseProxy}"/>

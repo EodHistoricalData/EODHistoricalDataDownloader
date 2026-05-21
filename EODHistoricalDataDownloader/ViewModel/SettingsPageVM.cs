@@ -85,6 +85,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                 _twoConnections = value;
                 MaxThreads = value ? 2 : 1;
                 OnPropertyChanged(nameof(TwoConnections));
+                NotifySaveCanExecuteChanged();
             }
         }
         private bool _twoConnections = Settings.SettingsFields.MaxThreads > 1;
@@ -100,8 +101,10 @@ namespace EODHistoricalDataDownloader.ViewModel
             get => _useProxy;
             set
             {
+                if (_useProxy == value) return;
                 _useProxy = value;
                 OnPropertyChanged(nameof(UseProxy));
+                NotifySaveCanExecuteChanged();
             }
         }
         private bool _useProxy = Settings.SettingsFields.UseProxy;
@@ -111,8 +114,10 @@ namespace EODHistoricalDataDownloader.ViewModel
             get => _proxyHost;
             set
             {
+                if (_proxyHost == value) return;
                 _proxyHost = value;
                 OnPropertyChanged(nameof(ProxyHost));
+                NotifySaveCanExecuteChanged();
             }
         }
         private string _proxyHost = Settings.SettingsFields.ProxyHost;
@@ -122,8 +127,10 @@ namespace EODHistoricalDataDownloader.ViewModel
             get => _withCredentials;
             set
             {
+                if (_withCredentials == value) return;
                 _withCredentials = value;
                 OnPropertyChanged(nameof(WithCredentials));
+                NotifySaveCanExecuteChanged();
             }
         }
         private bool _withCredentials = Settings.SettingsFields.WithCredentials;
@@ -133,8 +140,10 @@ namespace EODHistoricalDataDownloader.ViewModel
             get => _proxyUsername;
             set
             {
+                if (_proxyUsername == value) return;
                 _proxyUsername = value;
                 OnPropertyChanged(nameof(ProxyUsername));
+                NotifySaveCanExecuteChanged();
             }
         }
         private string _proxyUsername = Settings.SettingsFields.ProxyUsername;
@@ -144,40 +153,66 @@ namespace EODHistoricalDataDownloader.ViewModel
             get => _proxyPassword;
             set
             {
+                if (_proxyPassword == value) return;
                 _proxyPassword = value;
                 OnPropertyChanged(nameof(ProxyPassword));
-
+                NotifySaveCanExecuteChanged();
             }
         }
         private string _proxyPassword = Settings.SettingsFields.ProxyPassword;
 
+        private int _snapshotMaxThreads;
+        private bool _snapshotUseProxy;
+        private string _snapshotProxyHost = "";
+        private bool _snapshotWithCredentials;
+        private string _snapshotProxyUsername = "";
+        private string _snapshotProxyPassword = "";
+
+        private bool IsNonApiKeyDirty =>
+            _maxThreads != _snapshotMaxThreads
+            || _useProxy != _snapshotUseProxy
+            || _proxyHost != _snapshotProxyHost
+            || _withCredentials != _snapshotWithCredentials
+            || _proxyUsername != _snapshotProxyUsername
+            || _proxyPassword != _snapshotProxyPassword;
+
+        private void CaptureSnapshot()
+        {
+            _snapshotMaxThreads = _maxThreads;
+            _snapshotUseProxy = _useProxy;
+            _snapshotProxyHost = _proxyHost;
+            _snapshotWithCredentials = _withCredentials;
+            _snapshotProxyUsername = _proxyUsername;
+            _snapshotProxyPassword = _proxyPassword;
+        }
+
+        private static void NotifySaveCanExecuteChanged()
+        {
+            CommandManager.InvalidateRequerySuggested();
+        }
+
         public SettingsPageVM()
         {
-
+            CaptureSnapshot();
         }
 
-        public ICommand SaveSettings
-        {
-            get
+        private DelegateCommand? _saveSettings;
+        public ICommand SaveSettings => _saveSettings ??= new DelegateCommand(
+            _ =>
             {
-                return new DelegateCommand((obj) =>
-                {
-                    _apiKeyDebounce?.Stop();
-                    Settings.SettingsFields.APIKey = APIKey;
-                    Settings.SettingsFields.MaxThreads = MaxThreads;
-                    Settings.SettingsFields.UseProxy = UseProxy;
-                    Settings.SettingsFields.ProxyHost = ProxyHost;
-                    Settings.SettingsFields.WithCredentials = WithCredentials;
-                    Settings.SettingsFields.ProxyUsername = ProxyUsername;
-                    Settings.SettingsFields.ProxyPassword = ProxyPassword;
-                    Settings.Save();
-                    ApiKeyState = ApiKeySaveState.Saved;
-                },
-                (obj) =>
-                {
-                    return true;
-                });
-            }
-        }
+                _apiKeyDebounce?.Stop();
+                Settings.SettingsFields.APIKey = APIKey;
+                Settings.SettingsFields.MaxThreads = MaxThreads;
+                Settings.SettingsFields.UseProxy = UseProxy;
+                Settings.SettingsFields.ProxyHost = ProxyHost;
+                Settings.SettingsFields.WithCredentials = WithCredentials;
+                Settings.SettingsFields.ProxyUsername = ProxyUsername;
+                Settings.SettingsFields.ProxyPassword = ProxyPassword;
+                Settings.Save();
+                ApiKeyState = ApiKeySaveState.Saved;
+                CaptureSnapshot();
+                NotifySaveCanExecuteChanged();
+            },
+            _ => IsNonApiKeyDirty);
     }
 }
