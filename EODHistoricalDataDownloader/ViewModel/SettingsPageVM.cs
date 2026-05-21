@@ -1,10 +1,17 @@
-﻿using EODHistoricalDataDownloader.Program;
+using EODHistoricalDataDownloader.Program;
 using EODHistoricalDataDownloader.Utils;
 using System;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace EODHistoricalDataDownloader.ViewModel
 {
+    public enum ApiKeySaveState
+    {
+        Saved,
+        Saving
+    }
+
     internal class SettingsPageVM : BaseVM
     {
         public string? APIKey
@@ -12,11 +19,51 @@ namespace EODHistoricalDataDownloader.ViewModel
             get => _APIKey;
             set
             {
+                if (_APIKey == value) return;
                 _APIKey = value;
                 OnPropertyChanged(nameof(APIKey));
+                OnPropertyChanged(nameof(HasApiKey));
+                ScheduleApiKeyAutoSave();
             }
         }
         private string? _APIKey = Settings.SettingsFields.APIKey;
+
+        public bool HasApiKey => !string.IsNullOrEmpty(_APIKey);
+
+        public ApiKeySaveState ApiKeyState
+        {
+            get => _apiKeyState;
+            private set
+            {
+                if (_apiKeyState == value) return;
+                _apiKeyState = value;
+                OnPropertyChanged(nameof(ApiKeyState));
+            }
+        }
+        private ApiKeySaveState _apiKeyState = ApiKeySaveState.Saved;
+
+        private DispatcherTimer? _apiKeyDebounce;
+
+        private void ScheduleApiKeyAutoSave()
+        {
+            ApiKeyState = ApiKeySaveState.Saving;
+            _apiKeyDebounce ??= CreateApiKeyDebounceTimer();
+            _apiKeyDebounce.Stop();
+            _apiKeyDebounce.Start();
+        }
+
+        private DispatcherTimer CreateApiKeyDebounceTimer()
+        {
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
+            timer.Tick += (_, _) =>
+            {
+                _apiKeyDebounce!.Stop();
+                Settings.SettingsFields!.APIKey = _APIKey;
+                Settings.Save();
+                ApiKeyState = ApiKeySaveState.Saved;
+            };
+            return timer;
+        }
 
         public int MaxThreads
         {
@@ -29,31 +76,18 @@ namespace EODHistoricalDataDownloader.ViewModel
         }
         private int _maxThreads = Settings.SettingsFields.MaxThreads > 1 ? 2 : 1;
 
-        public bool OneThread
+        public bool TwoConnections
         {
-            get => _oneThread;
+            get => _twoConnections;
             set
             {
-                _oneThread = value;
-                if (value)
-                    MaxThreads = 1;
-                OnPropertyChanged(nameof(OneThread));
+                if (_twoConnections == value) return;
+                _twoConnections = value;
+                MaxThreads = value ? 2 : 1;
+                OnPropertyChanged(nameof(TwoConnections));
             }
         }
-        private bool _oneThread = Settings.SettingsFields.MaxThreads == 1;
-
-        public bool TwoThread
-        {
-            get => _twoThread;
-            set
-            {
-                _twoThread = value;
-                if (value)
-                    MaxThreads = 2;
-                OnPropertyChanged(nameof(TwoThread));
-            }
-        }
-        private bool _twoThread = Settings.SettingsFields.MaxThreads > 1;
+        private bool _twoConnections = Settings.SettingsFields.MaxThreads > 1;
 
         public int MaxThreadsRecommended
         {
@@ -128,6 +162,7 @@ namespace EODHistoricalDataDownloader.ViewModel
             {
                 return new DelegateCommand((obj) =>
                 {
+                    _apiKeyDebounce?.Stop();
                     Settings.SettingsFields.APIKey = APIKey;
                     Settings.SettingsFields.MaxThreads = MaxThreads;
                     Settings.SettingsFields.UseProxy = UseProxy;
@@ -136,6 +171,7 @@ namespace EODHistoricalDataDownloader.ViewModel
                     Settings.SettingsFields.ProxyUsername = ProxyUsername;
                     Settings.SettingsFields.ProxyPassword = ProxyPassword;
                     Settings.Save();
+                    ApiKeyState = ApiKeySaveState.Saved;
                 },
                 (obj) =>
                 {

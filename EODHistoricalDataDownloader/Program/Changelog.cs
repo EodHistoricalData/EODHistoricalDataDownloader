@@ -11,6 +11,16 @@ namespace EODHistoricalDataDownloader.Program
         {
             new Version
             {
+                Major = 2, Minor = 1, Build = 0, Revision = 5,
+                Name = "2.1.0.5",
+                Date = new DateTime(2026, 5, 21),
+                Description = "\n" +
+                    "- Settings: API key now saves automatically as you type, with a clear ✓ Saved indicator\n" +
+                    "- Settings: simultaneous connections is now a single checkbox for a cleaner choice\n" +
+                    "- Settings: proxy host and credentials fields are greyed out until their checkbox is ticked\n"
+            },
+            new Version
+            {
                 Major = 2, Minor = 1, Build = 0, Revision = 0,
                 Name = "2.1.0",
                 Date = new DateTime(2026, 5, 20),
