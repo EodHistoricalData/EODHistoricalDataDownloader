@@ -11,6 +11,16 @@ namespace EODHistoricalDataDownloader.Program
         {
             new Version
             {
+                Major = 2, Minor = 1, Build = 1, Revision = 0,
+                Name = "2.1.1",
+                Date = new DateTime(2026, 5, 26),
+                Description = "\n" +
+                    "- Metastock option produces files ready to import without manual Excel cleanup\n" +
+                    "- Amibroker option matches the AmiBroker ASCII layout\n" +
+                    "- New per-group choice between Unadjusted and Adjusted price exports\n"
+            },
+            new Version
+            {
                 Major = 2, Minor = 1, Build = 0, Revision = 5,
                 Name = "2.1.0.5",
                 Date = new DateTime(2026, 5, 21),

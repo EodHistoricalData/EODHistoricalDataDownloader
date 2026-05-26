@@ -1,6 +1,8 @@
 using EODHistoricalDataDownloader.Commands;
 using EODHistoricalDataDownloader.Model;
 using EODHistoricalDataDownloader.Program;
+using EODHistoricalDataDownloader.Services.Csv;
+using EODHistoricalDataDownloader.Services.Names;
 using EODHistoricalDataDownloader.Utils;
 
 using System;
@@ -195,10 +197,18 @@ namespace EODHistoricalDataDownloader.ViewModel
             var proxy = ProxyFactory.Create();
             bool oneFile = group.Output == "All in one file";
 
+            CsvFormat format = CsvWriterFactory.ParseFormat(group.Format);
+            ICsvWriter writer = CsvWriterFactory.Create(format);
+            ITickerNameResolver names = new TickerNameResolver(
+                apiKey, proxy, Program.Program.UserFolder, Program.Program.ProgramName);
+
+            bool adjusted = group.GetModel().Adjusted;
+
             var loader = new EndOfDayLoader(
                 apiKey, loadingStatuses, period,
                 group.DateFrom, group.DateTo,
-                maxThreads, proxy, group.IsUpdate, oneFile);
+                maxThreads, proxy, group.IsUpdate, oneFile,
+                format, adjusted, names, writer);
 
             await loader.LoadToCsvAsync(group.FilePath, ct);
         }

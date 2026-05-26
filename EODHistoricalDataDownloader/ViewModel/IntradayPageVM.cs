@@ -1,6 +1,8 @@
 ﻿using EODHistoricalDataDownloader.Commands;
 using EODHistoricalDataDownloader.Model;
 using EODHistoricalDataDownloader.Program;
+using EODHistoricalDataDownloader.Services.Csv;
+using EODHistoricalDataDownloader.Services.Names;
 using EODHistoricalDataDownloader.Utils;
 
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -27,7 +29,7 @@ namespace EODHistoricalDataDownloader.ViewModel
         private CancellationTokenSource _cts = new();
 
         public static List<string> ListOfInterval { get; set; } = new() { "1 minute", "5 minutes", "1 hour" };
-        public static List<string> ListOfFormat { get; set; } = new() { "Metastock", "Amibroker" };
+        public static List<string> ListOfFormat { get; set; } = new() { "Default", "Metastock", "Amibroker" };
         public static List<string> ListOfOutput { get; set; } = new() { "All in one file", "Separate files" };
 
         private bool _isValidating = false;
@@ -61,7 +63,9 @@ namespace EODHistoricalDataDownloader.ViewModel
                 Settings.SaveDebounced();
             }
         }
-        private string? _format = string.IsNullOrEmpty(Settings.SettingsFields.IntradayFormat) ? "Metastock" : Settings.SettingsFields.IntradayFormat;
+        private string? _format = (string.IsNullOrEmpty(Settings.SettingsFields.IntradayFormat) || Settings.SettingsFields.IntradayFormat == "Metastock")
+            ? "Default"
+            : Settings.SettingsFields.IntradayFormat;
 
         public string? Output
         {
@@ -213,7 +217,14 @@ namespace EODHistoricalDataDownloader.ViewModel
                     bool oneFile = Output == "All in one file";
                     _cts = new CancellationTokenSource();
                     var token = _cts.Token;
-                    var loader = new IntradayLoader(apiKey, loadingStatuses, interval, dateFrom, dateTo, maxThreads, proxy, isUpdate, oneFile);
+
+                    CsvFormat format = CsvWriterFactory.ParseFormat(Format);
+                    ICsvWriter writer = CsvWriterFactory.Create(format);
+                    ITickerNameResolver names = new TickerNameResolver(
+                        apiKey, proxy, Program.Program.UserFolder, Program.Program.ProgramName);
+
+                    var loader = new IntradayLoader(apiKey, loadingStatuses, interval, dateFrom, dateTo,
+                        maxThreads, proxy, isUpdate, oneFile, format, names, writer);
                     _ = Task.Run(async () => await loader.LoadToCsvAsync(filePath, token), token);
                 },
                 (obj) =>

@@ -16,8 +16,9 @@ namespace EODHistoricalDataDownloader.ViewModel
         private readonly DownloadGroup _model;
 
         public static List<string> ListOfPeriod { get; } = new() { "Daily", "Weekly", "Monthly" };
-        public static List<string> ListOfFormat { get; } = new() { "Metastock", "Amibroker" };
+        public static List<string> ListOfFormat { get; } = new() { "Default", "Metastock", "Amibroker" };
         public static List<string> ListOfOutput { get; } = new() { "All in one file", "Separate files" };
+        public static List<string> ListOfAdjusted { get; } = new() { "Unadjusted", "Adjusted" };
 
         public event Action<DownloadGroupVM>? DeleteRequested;
 
@@ -76,6 +77,19 @@ namespace EODHistoricalDataDownloader.ViewModel
             }
         }
         private string? _output;
+
+        public string AdjustedChoice
+        {
+            get => _adjustedChoice;
+            set
+            {
+                _adjustedChoice = value;
+                OnPropertyChanged(nameof(AdjustedChoice));
+                _model.Adjusted = string.Equals(value, "Adjusted", StringComparison.OrdinalIgnoreCase);
+                Settings.SaveDebounced();
+            }
+        }
+        private string _adjustedChoice;
 
         public DateTime DateFrom
         {
@@ -143,8 +157,15 @@ namespace EODHistoricalDataDownloader.ViewModel
             _model = model;
             _name = model.Name;
             _period = model.Period;
-            _format = string.IsNullOrEmpty(model.Format) ? "Metastock" : model.Format;
+            // Pre-2.1.1 users had Format="Metastock" but the writer was inert and emitted
+            // reflection-based CSV (now called "Default"). Migrate them so behavior is preserved
+            // on upgrade; users who want actual MetaStock output must select it explicitly.
+            _format = (string.IsNullOrEmpty(model.Format) || model.Format == "Metastock")
+                ? "Default"
+                : model.Format;
+            if (_format != model.Format) _model.Format = _format;
             _output = model.Output;
+            _adjustedChoice = model.Adjusted ? "Adjusted" : "Unadjusted";
             _dateFrom = model.DateFrom;
             _dateTo = model.DateTo;
             _filePath = model.FilePath;

@@ -126,6 +126,11 @@
             </StackPanel>
 
             <StackPanel Margin="0,4,0,0">
+                <Label>Price adjustment:</Label>
+                <ComboBox ItemsSource="{Binding ListOfAdjusted}" SelectedItem="{Binding AdjustedChoice}"/>
+            </StackPanel>
+
+            <StackPanel Margin="0,4,0,0">
                 <Label>Tickers merging:</Label>
                 <ComboBox ItemsSource="{Binding ListOfOutput}" SelectedItem="{Binding Output}"/>
             </StackPanel>

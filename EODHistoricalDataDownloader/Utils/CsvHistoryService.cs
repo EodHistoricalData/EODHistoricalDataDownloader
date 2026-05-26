@@ -34,18 +34,28 @@ namespace EODLoader.Services.Utils
                 if (string.IsNullOrWhiteSpace(lastLine))
                     return null;
 
-                var firstField = lastLine.Split(',')[0].Trim().Trim('"');
-
-                if (DateTime.TryParseExact(firstField, DateFormats,
-                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+                foreach (var rawField in lastLine.Split(','))
                 {
-                    return date;
+                    var field = rawField.Trim().Trim('"');
+                    if (field.Length < 6) continue;
+
+                    if (DateTime.TryParseExact(field, DateFormats,
+                        CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+                    {
+                        return date;
+                    }
                 }
 
-                if (DateTime.TryParse(firstField, CultureInfo.InvariantCulture,
-                    DateTimeStyles.None, out var fallbackDate))
+                foreach (var rawField in lastLine.Split(','))
                 {
-                    return fallbackDate;
+                    var field = rawField.Trim().Trim('"');
+                    if (field.Length < 6) continue;
+
+                    if (DateTime.TryParse(field, CultureInfo.InvariantCulture,
+                        DateTimeStyles.None, out var fallbackDate))
+                    {
+                        return fallbackDate;
+                    }
                 }
 
                 return null;

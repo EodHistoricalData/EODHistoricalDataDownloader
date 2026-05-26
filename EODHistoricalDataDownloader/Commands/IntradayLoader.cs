@@ -2,8 +2,8 @@ using EOD;
 using EOD.Model;
 
 using EODHistoricalDataDownloader.Model;
-
-using EODLoader.Services.Utils;
+using EODHistoricalDataDownloader.Services.Csv;
+using EODHistoricalDataDownloader.Services.Names;
 
 using System;
 using System.Collections.Concurrent;
@@ -28,9 +28,15 @@ namespace EODHistoricalDataDownloader.Commands
         internal WebProxy Proxy { get; set; }
         internal bool IsUpdate { get; set; }
         internal bool OneFile { get; set; }
+        internal CsvFormat Format { get; set; }
+        internal ITickerNameResolver Names { get; set; }
+        internal ICsvWriter Writer { get; set; }
 
-        internal IntradayLoader(string apiKey, List<LoadingStatus> loadingStatuses, IntradayHistoricalInterval interval, DateTime dateFrom, DateTime dateTo,
-            int maxThreads, WebProxy proxy, bool isUpdate, bool oneFile)
+        internal IntradayLoader(string apiKey, List<LoadingStatus> loadingStatuses, IntradayHistoricalInterval interval,
+            DateTime dateFrom, DateTime dateTo, int maxThreads, WebProxy proxy,
+            bool isUpdate, bool oneFile,
+            CsvFormat format,
+            ITickerNameResolver names, ICsvWriter writer)
         {
             ApiKey = apiKey;
             LoadingStatuses = loadingStatuses;
@@ -41,13 +47,17 @@ namespace EODHistoricalDataDownloader.Commands
             Proxy = proxy;
             IsUpdate = isUpdate;
             OneFile = oneFile;
+            Format = format;
+            Names = names;
+            Writer = writer;
         }
 
         internal async Task LoadToCsvAsync(string filePath, CancellationToken ct = default)
         {
             var _api = new API(ApiKey, Proxy, Program.Program.ProgramName);
-            IUtilsService utils = new UtilsService();
             using var semaphore = new SemaphoreSlim(MaxThreads);
+
+            bool needsName = Format == CsvFormat.Metastock;
 
             try
             {
@@ -60,9 +70,27 @@ namespace EODHistoricalDataDownloader.Commands
                         {
                             ct.ThrowIfCancellationRequested();
                             status.Status = TickerStatus.Processing;
-                            List<IntradayHistoricalStockPrice>? response = await _api.GetIntradayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Interval);
+                            List<IntradayHistoricalStockPrice>? response = await _api.GetIntradayHistoricalStockPriceAsync(
+                                status.Ticker, DateFrom, DateTo, Interval);
+
+                            string? name = needsName
+                                ? await Names.ResolveAsync(status.Ticker, ct)
+                                : null;
+
+                            var rows = (response ?? new List<IntradayHistoricalStockPrice>())
+                                .Where(p => p.DateTime.HasValue)
+                                .Select(p => new IntradayRow(
+                                    status.Ticker, name, p.DateTime!.Value,
+                                    SymbolUtils.AsLong(p.Timestamp),
+                                    p.Gmtoffset is null ? null : (int?)System.Convert.ToInt32(p.Gmtoffset),
+                                    SymbolUtils.AsDecimal(p.Open),
+                                    SymbolUtils.AsDecimal(p.High),
+                                    SymbolUtils.AsDecimal(p.Low),
+                                    SymbolUtils.AsDecimal(p.Close),
+                                    SymbolUtils.AsLong(p.Volume)));
+
                             string path = Path.Combine(filePath, $"{status.Ticker}.csv");
-                            await utils.CreateCVSFile(response, path, IsUpdate);
+                            await Writer.WriteIntradayAsync(path, rows, append: IsUpdate, oneFile: false);
                             status.Status = TickerStatus.OK;
                             status.Filename = path;
                         }
@@ -86,7 +114,7 @@ namespace EODHistoricalDataDownloader.Commands
                 }
                 else
                 {
-                    var responseTickerList = new ConcurrentBag<IntradayHistoricalStockPriceTicker>();
+                    var allRows = new ConcurrentBag<IntradayRow>();
 
                     var tasks = LoadingStatuses.Select(status => Task.Run(async () =>
                     {
@@ -95,10 +123,28 @@ namespace EODHistoricalDataDownloader.Commands
                         {
                             ct.ThrowIfCancellationRequested();
                             status.Status = TickerStatus.Processing;
-                            List<IntradayHistoricalStockPrice>? response = await _api.GetIntradayHistoricalStockPriceAsync(status.Ticker, DateFrom, DateTo, Interval);
-                            foreach (var item in response)
+                            List<IntradayHistoricalStockPrice>? response = await _api.GetIntradayHistoricalStockPriceAsync(
+                                status.Ticker, DateFrom, DateTo, Interval);
+
+                            string? name = needsName
+                                ? await Names.ResolveAsync(status.Ticker, ct)
+                                : null;
+
+                            if (response != null)
                             {
-                                responseTickerList.Add(new IntradayHistoricalStockPriceTicker(status.Ticker, item));
+                                foreach (var p in response)
+                                {
+                                    if (!p.DateTime.HasValue) continue;
+                                    allRows.Add(new IntradayRow(
+                                        status.Ticker, name, p.DateTime.Value,
+                                        SymbolUtils.AsLong(p.Timestamp),
+                                        p.Gmtoffset is null ? null : (int?)System.Convert.ToInt32(p.Gmtoffset),
+                                        SymbolUtils.AsDecimal(p.Open),
+                                        SymbolUtils.AsDecimal(p.High),
+                                        SymbolUtils.AsDecimal(p.Low),
+                                        SymbolUtils.AsDecimal(p.Close),
+                                        SymbolUtils.AsLong(p.Volume)));
+                                }
                             }
                             status.Status = TickerStatus.OK;
                         }
@@ -120,9 +166,12 @@ namespace EODHistoricalDataDownloader.Commands
 
                     await Task.WhenAll(tasks);
 
-                    var sortedList = responseTickerList.OrderBy(x => x.Ticker).ToList();
+                    var sortedRows = allRows
+                        .OrderBy(r => r.Ticker)
+                        .ThenBy(r => r.DateTime)
+                        .ToList();
                     string path = Path.Combine(filePath, "Intraday Tickers.csv");
-                    await utils.CreateCVSFile(sortedList, path, IsUpdate);
+                    await Writer.WriteIntradayAsync(path, sortedRows, append: IsUpdate, oneFile: true);
                 }
             }
             catch (OperationCanceledException)

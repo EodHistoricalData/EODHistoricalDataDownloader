@@ -2,6 +2,12 @@
 
 All notable user-facing changes are listed here. The same text is shown on the app's Welcome page.
 
+## 2.1.1 — 2026-05-26
+
+- Metastock option produces files ready to import without manual Excel cleanup.
+- Amibroker option matches the AmiBroker ASCII layout.
+- New per-group choice between Unadjusted and Adjusted price exports.
+
 ## 2.1.0.5 — 2026-05-21
 
 - Settings: API key now saves automatically as you type, with a clear ✓ Saved indicator.

@@ -88,7 +88,7 @@ namespace EODHistoricalDataDownloader.Program
             {
                 Name = "Default",
                 Period = SettingsFields.EndOfDayPeriod ?? "Daily",
-                Format = SettingsFields.EndOfDayFormat ?? "Metastock",
+                Format = SettingsFields.EndOfDayFormat ?? "Default",
                 Output = SettingsFields.EndOfDayOutput ?? "Separate files",
                 DateFrom = SettingsFields.EndOfDayFrom,
                 DateTo = SettingsFields.EndOfDayTo,

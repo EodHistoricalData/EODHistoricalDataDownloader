@@ -22,7 +22,7 @@ namespace EODHistoricalDataDownloader.Program
         // Legacy flat fields — kept for backward compatibility with old settings.xml
         public List<string>? EndOfDayTickers;
         public string EndOfDayPeriod = "Daily";
-        public string EndOfDayFormat = "Metastock";
+        public string EndOfDayFormat = "Default";
         public string EndOfDayOutput = "Separate files";
         public DateTime EndOfDayFrom = DateTime.Today;
         public DateTime EndOfDayTo = DateTime.Today;
@@ -34,7 +34,7 @@ namespace EODHistoricalDataDownloader.Program
 
         public List<string>? IntradayTickers;
         public string IntradayInterval = "5 minutes";
-        public string IntradayFormat = "Metastock";
+        public string IntradayFormat = "Default";
         public string IntradayOutput = "Separate files";
         public DateTime IntradayFrom = DateTime.Today;
         public DateTime IntradayTo = DateTime.Today;

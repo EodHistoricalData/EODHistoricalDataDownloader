@@ -11,8 +11,9 @@ namespace EODHistoricalDataDownloader.Model
         public List<string> Tickers = new();
         public string FilePath = "";
         public string Period = "Daily";
-        public string Format = "Metastock";
+        public string Format = "Default";
         public string Output = "Separate files";
+        public bool Adjusted;
         public DateTime DateFrom = DateTime.Today;
         public DateTime DateTo = DateTime.Today;
         public bool IsUpdate;
