@@ -1,12 +1,23 @@
 <Program>
 <Name>EODHistoricalDataDownloader</Name>
-<PublishDate>02.02.2022</PublishDate>
-<Version name="2.0.0.0 beta">
-<Number>2.0.0.0</Number>
-<Date>02.02.2022</Date>
+<PublishDate>26.05.2026</PublishDate>
+<Version name="2.1.1">
+<Number>2.1.1.0</Number>
+<Date>26.05.2026</Date>
 <Description>
-New design.
-Added Intraday Historical Data API.
+Metastock option produces files ready to import without manual Excel cleanup.
+Amibroker option matches the AmiBroker ASCII layout.
+New per-group choice between Unadjusted and Adjusted price exports.
+</Description>
+<Link>https://eodhistoricaldata.com/download/Setup EODHistoricalDataDownloader.exe</Link>
+</Version>
+<Version name="2.1.0">
+<Number>2.1.0.0</Number>
+<Date>20.05.2026</Date>
+<Description>
+Download Groups: create multiple named ticker groups, each with its own folder and settings.
+Download All: one-click download for all groups sequentially.
+True incremental update: Update mode reads the last date from existing CSV and appends only new data.
 </Description>
 <Link>https://eodhistoricaldata.com/download/Setup EODHistoricalDataDownloader.exe</Link>
 </Version>
